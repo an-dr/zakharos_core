@@ -1,0 +1,6 @@
+string node_cmd
+uint8 addr
+uint8 reg
+uint8 reg_value
+---
+uint16 reg_value

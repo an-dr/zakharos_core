@@ -1,0 +1,15 @@
+# python
+**.pyc
+*.egg-info
+.venv
+src/zakhar_mind/scripts/dist
+src/zakhar_mind/scripts/poetry.lock
+
+# catkin ws files
+build
+devel
+.catkin_workspace
+src/CMakeLists.txt
+
+# zk files
+logs
