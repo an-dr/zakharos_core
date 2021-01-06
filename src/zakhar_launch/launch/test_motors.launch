@@ -1,0 +1,6 @@
+<launch>
+
+    <include file="$(dirname)/low_level.launch" />
+    <node name="ego_motors_test" pkg="zakhar_mind_tests" type="ego_motors_test.py"/>
+
+</launch>
