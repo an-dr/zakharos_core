@@ -1,0 +1,106 @@
+{
+	"extensions": {
+		"recommendations": [
+			"actboy168.tasks",
+			"gruntfuggly.todo-tree",
+			"ms-iot.vscode-ros",
+			"ms-python.python",
+			"njpwerner.autodocstring",
+			"yzhang.markdown-all-in-one",
+		]
+	},
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"launch": {
+		"configurations": [
+			{
+				"name": "Python: Current File",
+				"type": "python",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+			},
+		],
+		"compounds": []
+	},
+	"settings": {
+		"debug.allowBreakpointsEverywhere": true,
+		"files.exclude": {
+			"**/*.pyc": true
+		},
+		"python.linting.pylintEnabled": false,
+		"python.linting.enabled": true,
+		"python.linting.flake8Enabled": false,
+		"python.languageServer": "Pylance",
+		"python.formatting.blackArgs": [
+			"--line-length 119"
+		],
+		"python.linting.banditEnabled": true,
+		"python.analysis.extraPaths": [ //${workspaceFolder} is not recognizanle by Pylance yet
+			"/opt/ros/noetic/lib/python3/dist-packages/",
+			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_common/src",
+			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_i2c/src",
+			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_i2c_devices/src",
+			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_log/src",
+			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_mind/src",
+			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_mind_tests/src",
+			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_interpreters/src",
+			"/home/mind/zakhar_brain/zakharos_core/devel/lib/python3/dist-packages",
+		],
+		"ros.distro": "noetic",
+		"terminal.integrated.shell.linux": "/bin/bash",
+		"python.autoComplete.extraPaths": [
+			"/home/mind/zakhar_brain/zakharos_core/devel/lib/python3/dist-packages",
+			"/opt/ros/noetic/lib/python3/dist-packages"
+		],
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+
+			{
+				"label": "Build",
+				"type": "shell",
+				"group": "build",
+				"command": "bash ${workspaceFolder}/build.sh",
+				"options": {
+					"cwd": "${workspaceFolder}",
+				},
+			},
+			{
+				"label": "Clean Build",
+				"type": "shell",
+				"group": "build",
+				"command": "bash ${workspaceFolder}/build.sh",
+				"dependsOn": [
+					"Clean"
+				],
+				"options": {
+					"cwd": "${workspaceFolder}",
+				},
+			},
+			{
+				"label": "Clean",
+				"type": "shell",
+				"command": "catkin clean --yes",
+				"options": {
+					"cwd": "${workspaceFolder}",
+				},
+			},
+			{
+				"label": "Kill all python processes",
+				"type": "shell",
+				"command": "pkill python",
+			},
+			{
+				"label": "Start roscore",
+				"type": "shell",
+				"isBackground": true,
+				"command": "roscore",
+			},
+		]
+	}
+}

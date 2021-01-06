@@ -1,0 +1,6 @@
+<launch>
+
+    <include file="$(dirname)/devices.launch" />
+    <include file="$(dirname)/interpreters.launch" />
+
+</launch>

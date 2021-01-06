@@ -1,0 +1,8 @@
+<launch>
+
+    <node name="i2c_server" pkg="zakhar_i2c" type="i2c_server.py"/>
+    <node name="face_platform" pkg="zakhar_i2c_devices" type="face_platform.py"/>
+    <node name="moving_platform" pkg="zakhar_i2c_devices" type="moving_platform.py"/>
+    <node name="sensor_platform" pkg="zakhar_i2c_devices" type="sensor_platform.py"/>
+
+</launch>

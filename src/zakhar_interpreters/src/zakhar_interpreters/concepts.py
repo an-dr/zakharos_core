@@ -1,48 +1,44 @@
 import rospy
 from time import sleep
-import zakhar_common as com
-from zakhar_pycore import zakhar__log as log
-import zakhar_i2c_devices as dev
 from zakhar_i2c_devices.moving_platform import CMD_BACKWARD, CMD_FORWARD, CMD_LEFT, CMD_RIGHT, CMD_SHIVER, CMD_STOP
 from zakhar_i2c_devices.face_platform import CMD_ANGRY, CMD_BLINK, CMD_CALM, CMD_HAPPY, CMD_SAD
-from zakhar_msgs import msg, srv
-from .concept_translator_abstract import ConceptTranslatorAbstract
+from .concept2commands_interpreter_abstract import Concept2CommandsInterpreterAbstract
 
-class ConceptsMove(ConceptTranslatorAbstract):
+class ConceptsMove(Concept2CommandsInterpreterAbstract):
     def move_forward(self):
-        self.l.info("move_stop")
+        rospy.loginfo("move_stop")
         self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD_FORWARD)
         self.exec_in_progress = False
 
     def move_backward(self):
-        self.l.info("move_stop")
+        rospy.loginfo("move_stop")
         self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD_BACKWARD)
         self.exec_in_progress = False
 
     def move_left(self):
-        self.l.info("move_stop")
+        rospy.loginfo("move_stop")
         self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD_LEFT)
         self.exec_in_progress = False
 
     def move_right(self):
-        self.l.info("move_stop")
+        rospy.loginfo("move_stop")
         self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD_RIGHT)
         self.exec_in_progress = False
 
     def move_stop(self):
-        self.l.info("move_stop")
+        rospy.loginfo("move_stop")
         self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD_STOP)
         self.exec_in_progress = False
 
     def move_shiver(self):
-        self.l.info("move_shiver")
+        rospy.loginfo("move_shiver")
         self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD_SHIVER)
         self.exec_in_progress = False
 
 
-class ConceptsPanic(ConceptTranslatorAbstract):
+class ConceptsPanic(Concept2CommandsInterpreterAbstract):
     def basic_panic(self):
-        self.l.info("basic_panic")
+        rospy.loginfo("basic_panic")
         self.publish(target="face_platform", arg_str="w", arg_a=0, arg_b=CMD_SAD)
 
         if False:
@@ -84,13 +80,13 @@ class ConceptsPanic(ConceptTranslatorAbstract):
         self.exec_in_progress = False
 
 
-class ConceptsBacicReactions(ConceptTranslatorAbstract):
+class ConceptsBacicReactions(Concept2CommandsInterpreterAbstract):
     def hello(self):
-        self.l.info("hello")
+        rospy.loginfo("hello")
         self.publish(target="face_platform", arg_str="w", arg_a=0, arg_b=CMD_CALM)
         self.exec_in_progress = False
 
     def bye(self):
-        self.l.info("bye")
+        rospy.loginfo("bye")
         self.publish(target="face_platform", arg_str="w", arg_a=0, arg_b=CMD_BLINK)
         self.exec_in_progress = False

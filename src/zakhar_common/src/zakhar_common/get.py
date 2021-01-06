@@ -1,56 +1,50 @@
 import rospy
-from zakhar_pycore import zakhar__log as log
+from rospy.client import _unspecified
+from time import time, sleep
+from typing import Any
 
 
-def server(name, service, handle, logger=None):
+def server(name, service, handle):
     """
     Parameters
     ----------
     name : str
     service : Any
     handle : fn(req)->resp
-    logger : log.Logger or None
     """
-    if logger:
-        logger.debug("Service \'%s\' is loading..." % name)
+    rospy.logdebug("Service \'%s\' is loading..." % name)
     s = rospy.Service(name, service, handle)
-    if logger:
-        logger.debug("Service \'%s\' is ready" % name)
+    rospy.logdebug("Service \'%s\' is ready" % name)
     return s
 
 
-def client(name, service, logger=None):
+def client(name, service):
     """
     Parameters
     ----------
     name : str
     service : Any
-    logger : log.Logger, optional
     """
-    if logger:
-        logger.debug("Client \'%s\' is loading..." % name)
+    rospy.logdebug("Client \'%s\' is loading..." % name)
     c = rospy.ServiceProxy(name, service)
-    if logger:
-        logger.debug("Client \'%s\' is ready" % name)
+    rospy.logdebug("Client \'%s\' is ready" % name)
     return c
 
 
-def publisher(topic_name, data_class, logger=None):
+def publisher(topic_name, data_class):
     """
     Parameters
     ----------
     topic_name : str
     data_class : L{Message} class
-    logger : log.Logger, optional
     """
-    if logger:
-        logger.debug("Publisher \'%s\' is loading..." % topic_name)
-    p = rospy.Publisher(topic_name,data_class, queue_size=10)
-    if logger:
-        logger.debug("Publisher \'%s\' is ready" % topic_name)
+    rospy.logdebug("Publisher \'%s\' is loading..." % topic_name)
+    p = rospy.Publisher(topic_name, data_class, queue_size=10)
+    rospy.logdebug("Publisher \'%s\' is ready" % topic_name)
     return p
 
-def subscriber(topic_name, data_class, callback, callback_args=None, logger=None):
+
+def subscriber(topic_name, data_class, callback, callback_args=None):
     """
     Parameters
     ----------
@@ -58,12 +52,36 @@ def subscriber(topic_name, data_class, callback, callback_args=None, logger=None
     data_class : L{Message} class
     callback : fn(msg, cb_args)
     callback_args : any, optional
-    logger : log.Logger, optional
     """
-    if logger:
-        logger.debug("Subscriber of \'%s\' is loading..." % topic_name)
+    rospy.logdebug("Subscriber \'%s\' is loading..." % topic_name)
     s = rospy.Subscriber(topic_name, data_class, callback, callback_args)
-    if logger:
-        logger.debug("Subscriber of \'%s\' is ready" % topic_name)
+    rospy.logdebug("Subscriber \'%s\' is ready" % topic_name)
     return s
 
+
+def param(name: str, default: Any = _unspecified, timeout_s: int = 0) -> Any:
+    """
+    Parameters
+    ----------
+    name : str
+    default : Any
+    timeout_s : int
+        timeout_s > 0  - try to read the parameter during the timeout
+        timeout_s == 0 - try to read the parameter one time without a timeout
+        timeout < 0 - try to read the parameter until success
+    """
+    if timeout_s > 0:
+        start = time()
+        while ((time() - start) < timeout_s):
+            try:
+                return rospy.get_param(name, default)
+            except (rospy.ROSException, KeyError):
+                sleep(.1)
+    elif timeout_s < 0:
+        while 1:
+            try:
+                return rospy.get_param(name, default)
+            except (rospy.ROSException, KeyError):
+                sleep(.1)
+    else:
+        return rospy.get_param(name, default)

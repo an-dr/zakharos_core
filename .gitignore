@@ -8,7 +8,7 @@ src/zakhar_mind/scripts/poetry.lock
 # catkin ws files
 build
 devel
-.catkin_workspace
+.catkin_tools
 src/CMakeLists.txt
 
 # zk files

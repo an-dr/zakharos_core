@@ -16,7 +16,7 @@ else
 fi
 
 log "Build workspace..."
-catkin_make -C "$WS_DIR"
+catkin build --workspace "$WS_DIR"
 $WS_DIR/scripts/tool_make_exec.sh
 log "Build complete"
 
