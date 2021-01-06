@@ -1,13 +1,12 @@
 from time import sleep
 import zakhar_common as com
-from zakhar_pycore import zakhar__log as log
 import zakhar_i2c_devices as dev
 from .ego_like import EgoLikeNode
 
 
 class EgoSmallResearcher(EgoLikeNode):
-    def __init__(self, name="EgoSmallResearcher", log_level=log.INFO):
-        EgoLikeNode.__init__(self, name=name, log_level=log_level)
+    def __init__(self, name="EgoSmallResearcher"):
+        EgoLikeNode.__init__(self, name=name)
 
     def main(self):
         while (1):

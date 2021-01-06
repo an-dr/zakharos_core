@@ -4,7 +4,6 @@ import rospy
 import logging
 
 import zakhar_common as com
-import zakhar_log as log
 import zakhar_i2c_devices as dev
 import zakhar_mind
 from zakhar_msgs import srv
