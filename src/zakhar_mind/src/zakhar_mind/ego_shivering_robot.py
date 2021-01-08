@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import rospy
 from zakhar_mind.ego_like import EgoLikeNode
 from time import sleep

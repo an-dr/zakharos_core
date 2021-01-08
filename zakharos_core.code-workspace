@@ -33,34 +33,41 @@
 		},
 		"python.linting.pylintEnabled": false,
 		"python.linting.enabled": true,
-		"python.linting.flake8Enabled": false,
-		"python.languageServer": "Pylance",
+		"python.linting.flake8Enabled": true,
+		"python.languageServer": "Jedi",
+		// "python.analysis.logLevel": "Trace",
 		"python.formatting.blackArgs": [
 			"--line-length 119"
 		],
 		"python.linting.banditEnabled": true,
-		"python.analysis.extraPaths": [ //${workspaceFolder} is not recognizanle by Pylance yet
+		"python.analysis.extraPaths": [
 			"/opt/ros/noetic/lib/python3/dist-packages/",
-			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_common/src",
-			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_i2c/src",
-			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_i2c_devices/src",
-			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_log/src",
-			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_mind/src",
-			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_mind_tests/src",
-			"/home/mind/zakhar_brain/zakharos_core/src/zakhar_interpreters/src",
-			"/home/mind/zakhar_brain/zakharos_core/devel/lib/python3/dist-packages",
+			"${workspaceFolder}/devel/lib/python3/dist-packages",
+			"${workspaceFolder}/src/zakhar_common/src",
+			"${workspaceFolder}/src/zakhar_i2c/src",
+			"${workspaceFolder}/src/zakhar_i2c_devices/src",
+			"${workspaceFolder}/src/zakhar_log/src",
+			"${workspaceFolder}/src/zakhar_mind/src",
+			"${workspaceFolder}/src/zakhar_mind_tests/src",
+			"${workspaceFolder}/src/zakhar_interpreters/src",
 		],
 		"ros.distro": "noetic",
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"python.autoComplete.extraPaths": [
-			"/home/mind/zakhar_brain/zakharos_core/devel/lib/python3/dist-packages",
-			"/opt/ros/noetic/lib/python3/dist-packages"
+			"/opt/ros/noetic/lib/python3/dist-packages/",
+			"${workspaceFolder}/devel/lib/python3/dist-packages",
+			"${workspaceFolder}/src/zakhar_common/src",
+			"${workspaceFolder}/src/zakhar_i2c/src",
+			"${workspaceFolder}/src/zakhar_i2c_devices/src",
+			"${workspaceFolder}/src/zakhar_log/src",
+			"${workspaceFolder}/src/zakhar_mind/src",
+			"${workspaceFolder}/src/zakhar_mind_tests/src",
+			"${workspaceFolder}/src/zakhar_interpreters/src",
 		],
 	},
 	"tasks": {
 		"version": "2.0.0",
 		"tasks": [
-
 			{
 				"label": "Build",
 				"type": "shell",

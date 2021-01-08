@@ -11,5 +11,8 @@ devel
 .catkin_tools
 src/CMakeLists.txt
 
-# zk files
+# logs
 logs
+
+# ide files
+.vscode
