@@ -43,24 +43,11 @@ class ZkI2cDevice(object):
         self._address = address
         self.subscriber = None
         self.client = None
+        self.client_lock = threading.Lock()
         self.publisher = None
         self._started = False
         self.poll_dict = poll_dict
         self.poll_threads = []
-
-    # def _srv_handle(req):
-    #     rospy.logdebug("handle")
-    #     return device_serviceResponse(r)
-
-    #     if (req.command == "w"):
-    #         self.write(req.address, req.argument)
-    #         return (0xFF, 'done')
-    #     elif (req.command == "r"):
-    #         r = i2c_read_byte_from(req.addr, req.reg)
-    #         return device_serviceResponse(r)
-    #     else:
-    #         l.error("Wrong I2C cmd. Variants: w, r")
-    #         return 0x0EFF
 
     def subscriber_callback(self, data):
         if ((data.target == self._name) or (data.target == 'all')):
@@ -128,9 +115,13 @@ class ZkI2cDevice(object):
         if not self.client:
             raise rospy.ServiceException
         try:
+            self.client_lock.acquire(blocking=True)
             resp = self.client("w", self._address, reg, val)
+            self.client_lock.release()
             return resp.reg_value
         except rospy.ServiceException as e:
+            if self.client_lock.locked:
+                self.client_lock.release()
             rospy.logerr("Service call failed: %s" % e)
 
     def read(self, reg):
@@ -138,9 +129,13 @@ class ZkI2cDevice(object):
         if not self.client:
             raise rospy.ServiceException
         try:
+            self.client_lock.acquire(blocking=True)
             resp = self.client("r", self._address, reg, 0)
+            self.client_lock.release()
             return resp.reg_value
         except rospy.ServiceException as e:
+            if self.client_lock.locked:
+                self.client_lock.release()
             rospy.logerr("Service call failed: %s" % e)
 
     def mode(self):
