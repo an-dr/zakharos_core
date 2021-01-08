@@ -3,6 +3,7 @@ from os.path import basename, splitext
 from zakhar_pycore.constants import ADDR
 from zakhar_i2c import ZkI2cDevice
 from .sensor_photo_resistor import ZkSensorPhotoResistor
+from .sensor_sound_distance import ZkSensorSoundDistance
 
 
 class I2cSensorPlatform(ZkI2cDevice):
@@ -12,10 +13,12 @@ class I2cSensorPlatform(ZkI2cDevice):
                                                       corr_window_ms=500,
                                                       pattern=[0, 0, 0, 255, 0, 0, 0],
                                                       threshold=0.7)
+        self.sensor_distance = ZkSensorSoundDistance(sensor_platform=self)
 
     def start(self):
         super(I2cSensorPlatform, self).run()
         self.sensor_photo_res.start(10)
+        self.sensor_distance.start(10)
         rospy.spin()
 
 
