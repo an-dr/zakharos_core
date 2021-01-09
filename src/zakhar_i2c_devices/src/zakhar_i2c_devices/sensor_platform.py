@@ -12,7 +12,7 @@ class I2cSensorPlatform(ZkI2cDevice):
         self.sensor_photo_res = ZkSensorPhotoResistor(sensor_platform=self,
                                                       corr_window_ms=500,
                                                       pattern=[0, 0, 0, 255, 0, 0, 0],
-                                                      threshold=0.7)
+                                                      threshold=0.6)
         self.sensor_distance = ZkSensorSoundDistance(sensor_platform=self)
 
     def start(self):

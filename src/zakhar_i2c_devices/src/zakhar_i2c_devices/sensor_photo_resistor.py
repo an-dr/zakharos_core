@@ -1,22 +1,20 @@
 import rospy
 from .sensor_abstract import ZkSensor
-from zakhar_pycore.helpers.format import list2strf
+from zakhar_pycore import helpers
+from zakhar_pycore.constants import REGS
 from collections import deque
 import numpy as np
 from PIL import Image
 from time import time
 from typing import Any
 
-REG_VAL_LO = 0x06
-REG_VAL_HI = 0x05
-
 CONFIG_PRINT_HALF_CORR = True
 CONFIG_PRINT_CORR = False
 CONFIG_PRINT_WINDOW = False
 CONFIG_PRINT_LIGHT = False
 
-SHADOW_CONTRAST_PRST = 0.05
-MINIMAL_TRIG_PERIOD_SEC = 3
+SHADOW_CONTRAST_PRST = 0.1
+MINIMAL_TRIG_PERIOD_SEC = 15
 
 MIN_LIGHT = 0
 MAX_LIGHT = 0xffff
@@ -28,24 +26,6 @@ MSG_TRIG = "bird"
 POLL_PERIOD = 0.01  # sec
 WINDOWS_SIZE_SEC = 0.5  # sec
 WINDOW_SIZE_ELEMENTS = int(WINDOWS_SIZE_SEC / POLL_PERIOD)
-
-
-# TODO move to zakhar_pycore
-def round_list(in_list, num):
-    new_l = []
-    for i in in_list:
-        new_l.append(round(i, num))
-    return new_l
-
-
-# TODO move to zakhar_pycore
-def calc_max_deviation(in_list):
-    lmax = float(max(in_list))
-    lmin = float(min(in_list))
-    delta = lmax - lmin
-    if not delta:
-        return 0
-    return delta / lmax
 
 
 class ZkSensorPhotoResistor(ZkSensor):
@@ -63,8 +43,8 @@ class ZkSensorPhotoResistor(ZkSensor):
 
     def read_light(self):
         try:
-            lo = self.sensor_platform.read(REG_VAL_LO)
-            hi = self.sensor_platform.read(REG_VAL_HI)
+            lo = self.sensor_platform.read(REGS.SENSOR_PLATFORM.LIGHT_LO)
+            hi = self.sensor_platform.read(REGS.SENSOR_PLATFORM.LIGHT_HI)
         except rospy.ServiceException:
             return 0xffff
         if lo is None or hi is None:
@@ -105,8 +85,8 @@ class ZkSensorPhotoResistor(ZkSensor):
             self.last_trig_time = time()
             # logging
             rospy.loginfo("Triggered! Correlation: %f" % corr_coef)
-            rospy.loginfo(round_list(self.corr_pattern, 1))
-            rospy.loginfo(round_list(list(self.mon_window), 1))
+            rospy.loginfo(helpers.lists.get_round(self.corr_pattern, 1))
+            rospy.loginfo(helpers.lists.get_round(list(self.mon_window), 1))
             rospy.loginfo(" --- ")
             # publishin of the event
             self.publish(dtype=MSG_TRIG)
@@ -160,7 +140,7 @@ class ZkSensorPhotoResistor(ZkSensor):
         self.mon_window_sz_elements = self.init_window(self.mon_windows_sz_ms)
         self.corr_pattern = init_pattern(self.corr_pattern_raw, self.mon_window_sz_elements)
         rospy.loginfo("pattern ")
-        rospy.loginfo(round_list(self.corr_pattern, 2))
+        rospy.loginfo(helpers.lists.get_round(self.corr_pattern, 2))
 
     def poll_once(self):
         # read light
@@ -169,13 +149,13 @@ class ZkSensorPhotoResistor(ZkSensor):
             rospy.loginfo("Light : " + hex(self.last_light))
         self.write_to_window(self.last_light)
         if CONFIG_PRINT_WINDOW and self.mon_window:
-            rospy.loginfo("h'" + list2strf(list(self.mon_window), 5, in_hex=True))
+            rospy.loginfo("h'" + helpers.format.list2strf(list(self.mon_window), 5, in_hex=True))
         # publishing
         self.publish(dtype=MSG_SENSOR_VALUE, valA=self.last_light)
         # handling the sensor value
         if self.corr_pattern is not None:
             #  if there is enough contrast
-            if calc_max_deviation(self.mon_window) > SHADOW_CONTRAST_PRST:
+            if helpers.lists.get_max_deviation(self.mon_window) > SHADOW_CONTRAST_PRST:
                 self.last_corr_coef = np.corrcoef(self.corr_pattern, self.mon_window)[1, 0]
                 self.trig_on_threshold(self.last_corr_coef)
             else:

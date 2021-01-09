@@ -1,0 +1,8 @@
+<launch>
+
+    <include file="$(dirname)/low_level.launch" />
+    <node name="ego_small_researcher" pkg="zakhar_mind" type="ego_small_researcher.py"/>
+    <node name="instinct_bird_panic" pkg="zakhar_mind" type="instinct_bird_panic.py"/>
+    <node name="instinct_avoid_close_objects" pkg="zakhar_mind" type="instinct_avoid_close_objects.py"/>
+
+</launch>

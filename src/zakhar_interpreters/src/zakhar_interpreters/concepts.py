@@ -3,6 +3,7 @@ from time import sleep
 from zakhar_i2c_devices.moving_platform import CMD_BACKWARD, CMD_FORWARD, CMD_LEFT, CMD_RIGHT, CMD_SHIVER, CMD_STOP
 from zakhar_i2c_devices.face_platform import CMD_ANGRY, CMD_BLINK, CMD_CALM, CMD_HAPPY, CMD_SAD
 from .concept2commands_interpreter_abstract import Concept2CommandsInterpreterAbstract
+from zakhar_pycore.constants import CMD
 
 class ConceptsMove(Concept2CommandsInterpreterAbstract):
     def move_forward(self):
@@ -33,6 +34,32 @@ class ConceptsMove(Concept2CommandsInterpreterAbstract):
     def move_shiver(self):
         rospy.loginfo("move_shiver")
         self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD_SHIVER)
+        self.exec_in_progress = False
+
+    def move_avoid_front(self):
+        rospy.loginfo("move_avoid_front")
+        self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.exec_in_progress = False
+
+    def move_avoid_left(self):
+        rospy.loginfo("move_avoid_left")
+        self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.publish(target="moving_platform", arg_str="w", arg_a=60, arg_b=CMD.MOVE.RIGHT)
+        sleep(1)
+        self.exec_in_progress = False
+
+    def move_avoid_right(self):
+        rospy.loginfo("move_avoid_right")
+        self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.publish(target="moving_platform", arg_str="w", arg_a=0, arg_b=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.publish(target="moving_platform", arg_str="w", arg_a=60, arg_b=CMD.MOVE.LEFT)
+        sleep(1)
         self.exec_in_progress = False
 
 

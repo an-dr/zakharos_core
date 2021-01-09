@@ -1,7 +1,9 @@
 import rospy
 from os.path import basename, splitext
 import zakhar_common as com
-from zakhar_msgs import msg, srv
+from zakhar_msgs import msg
+
+# TODO: move data interpretation from sensors to here
 
 
 class Data2ConceptInterpreter:
@@ -33,6 +35,7 @@ class Data2ConceptInterpreter:
                                              data_class=msg.SensorData,
                                              callback=self.interpretation)
         rospy.loginfo("[  DONE  ] Node \'%s\' is ready..." % self.name)
+
 
 def start():
     obj = Data2ConceptInterpreter()
