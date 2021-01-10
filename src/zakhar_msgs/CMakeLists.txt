@@ -48,13 +48,13 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files( FILES
   DeviceCmd.msg
-  SensorConcept.msg
+  PerceptionConcept.msg
   SensorData.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(FILES
-  Concept.srv
+  CommandConcept.srv
   I2c.srv
 )
 

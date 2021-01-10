@@ -20,7 +20,6 @@ MIN_LIGHT = 0
 MAX_LIGHT = 0xffff
 # CONFIG_SHADOW_CONTRAST_PRST = 0.5
 
-MSG_SENSOR_VALUE = "light"
 MSG_TRIG = "bird"
 
 POLL_PERIOD = 0.01  # sec
@@ -89,7 +88,7 @@ class ZkSensorPhotoResistor(ZkSensor):
             rospy.loginfo(helpers.lists.get_round(list(self.mon_window), 1))
             rospy.loginfo(" --- ")
             # publishin of the event
-            self.publish(dtype=MSG_TRIG)
+            self.publish(dtype=self.name, valString=MSG_TRIG)
         elif CONFIG_PRINT_HALF_CORR and (corr_coef >= self.threshold / 2):
             rospy.loginfo("Correlation: %f" % corr_coef)
         elif CONFIG_PRINT_CORR:
@@ -151,7 +150,7 @@ class ZkSensorPhotoResistor(ZkSensor):
         if CONFIG_PRINT_WINDOW and self.mon_window:
             rospy.loginfo("h'" + helpers.format.list2strf(list(self.mon_window), 5, in_hex=True))
         # publishing
-        self.publish(dtype=MSG_SENSOR_VALUE, valA=self.last_light)
+        self.publish(dtype=self.name, valA=self.last_light)
         # handling the sensor value
         if self.corr_pattern is not None:
             #  if there is enough contrast

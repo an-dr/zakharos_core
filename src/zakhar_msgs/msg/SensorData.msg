@@ -1,4 +1,4 @@
-string type
+string sensor_type
 uint32 valA
 uint32 valB
 uint32 valC

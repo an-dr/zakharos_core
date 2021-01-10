@@ -5,13 +5,12 @@ from zakhar_pycore.constants import REGS
 CONFIG_PRINT_VAL = True
 CONFIG_TRIG_DISTANCE = 0x05
 
-MSG_SENSOR_VALUE = "distances"
 MSG_TRIG = "obstacle"
 
 
 class ZkSensorSoundDistance(ZkSensor):
     def __init__(self, sensor_platform):
-        ZkSensor.__init__(self, name="sound_dist", sensor_platform=sensor_platform)
+        ZkSensor.__init__(self, name="sound_distance", sensor_platform=sensor_platform)
         self.last_val = [0xffff, 0xffff, 0xffff]
 
     def read_distance(self):
@@ -32,15 +31,16 @@ class ZkSensorSoundDistance(ZkSensor):
         if CONFIG_PRINT_VAL:
             rospy.loginfo("Distances : " + str(self.last_val))
         # publishing
-        self.publish(dtype=MSG_SENSOR_VALUE, valA=self.last_val[0], valB=self.last_val[1], valC=self.last_val[2])
+        self.publish(dtype=self.name, valA=self.last_val[0], valB=self.last_val[1], valC=self.last_val[2])
         # data handling
-        trigs_bin = 0b000
+        trigs = ""
         if self.last_val[0] <= CONFIG_TRIG_DISTANCE:
-            trigs_bin |= (1 << 0)
+            trigs = trigs + "l"
         if self.last_val[1] <= CONFIG_TRIG_DISTANCE:
-            trigs_bin |= (1 << 1)
+            trigs = trigs + "c"
         if self.last_val[2] <= CONFIG_TRIG_DISTANCE:
-            trigs_bin |= (1 << 2)
+            trigs = trigs + "r"
 
-        if trigs_bin:
-            self.publish(dtype=MSG_TRIG, valA=trigs_bin)
+        if len(trigs):  # if any trigger
+            rospy.loginfo("Trigger: %s", trigs)
+            self.publish(dtype=self.name, valString=trigs)
