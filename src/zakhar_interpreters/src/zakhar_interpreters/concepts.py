@@ -39,10 +39,18 @@ class ConceptsMove(Concept2CommandsInterpreterAbstract):
         rospy.loginfo("move_avoid_front")
         self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
         sleep(.2)
+        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+        sleep(.2)
         self.exec_in_progress = False
 
     def move_avoid_left(self, modificator=""):
         rospy.loginfo("move_avoid_left")
+        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+        sleep(.2)
         self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
         sleep(.2)
         self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
@@ -57,7 +65,11 @@ class ConceptsMove(Concept2CommandsInterpreterAbstract):
         sleep(.2)
         self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
         sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.RIGHT, arg=60)
+        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+        sleep(.2)
+        self.publish(target="moving_platform", cmd=CMD.MOVE.LEFT, arg=60)
         sleep(1)
         self.exec_in_progress = False
 
