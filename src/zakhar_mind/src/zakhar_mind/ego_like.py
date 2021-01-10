@@ -6,6 +6,7 @@ from zakhar_msgs import srv
 from zakhar_msgs import msg
 from enum import IntEnum
 
+
 class EgoLikeTypes(IntEnum):
     ego = 0x01
     instinct = 0x02
@@ -19,16 +20,15 @@ class EgoLikeNode:
         self.client = None
         self.subscriber = None
 
-    def sensor_callback(self, data):
-        rospy.loginfo("From SensorInterpreter: %s:0x%x" % (data.perception_summary, data.argument))
+    def sensor_callback(self, perception_concept):
+        rospy.loginfo("From SensorInterpreter: %s:%s" % (perception_concept.symbol, perception_concept.modificator))
 
     def _start_client(self):
         rospy.logdebug("Client \'%s\' is starting..." % self.name)
-        self.client = rospy.ServiceProxy(
-            com.names.NODE_CONCEPT_TRANSLATOR, srv.Concept)
+        self.client = rospy.ServiceProxy(com.names.NODE_CONCEPT_TRANSLATOR, srv.CommandConcept)
         self.subscriber = com.get.subscriber(topic_name=com.names.TOPIC_MAIN_SENSOR_INTERPRETER,
-                                        data_class=msg.SensorConcept,
-                                        callback=self.sensor_callback)
+                                             data_class=msg.PerceptionConcept,
+                                             callback=self.sensor_callback)
         rospy.loginfo("Client \'%s\' is ready" % self.name)
 
     def start(self):
@@ -41,12 +41,12 @@ class EgoLikeNode:
     def main(self):
         pass
 
-    def to_will(self, symbol):
-        rospy.loginfo("Ego is willing: %s" % symbol)
+    def to_will(self, symbol, modificator=""):
+        rospy.loginfo("Ego is willing: %s:%s" % (symbol, modificator))
         if not self.client:
             raise rospy.ServiceException
         try:
-            resp = self.client(self.ego_type, symbol)
+            resp = self.client(self.ego_type, symbol, modificator)
             return resp.result
         except rospy.ServiceException as e:
             print("Service call failed: %s" % e)

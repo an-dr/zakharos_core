@@ -41,53 +41,80 @@ class ZkI2cDevice(object):
 
         self._name = dev_name
         self._address = address
-        self.subscriber = None
-        self.client = None
-        self.publisher = None
+        self.subscriber_to_cmd = None
+        self.client_i2c = None
+        self.client_i2c_lock = threading.Lock()
+        self.publisher_of_sensor_data = None
         self._started = False
         self.poll_dict = poll_dict
         self.poll_threads = []
 
-    # def _srv_handle(req):
-    #     rospy.logdebug("handle")
-    #     return device_serviceResponse(r)
-
-    #     if (req.command == "w"):
-    #         self.write(req.address, req.argument)
-    #         return (0xFF, 'done')
-    #     elif (req.command == "r"):
-    #         r = i2c_read_byte_from(req.addr, req.reg)
-    #         return device_serviceResponse(r)
-    #     else:
-    #         l.error("Wrong I2C cmd. Variants: w, r")
-    #         return 0x0EFF
-
-    def subscriber_callback(self, data):
+    def subscriber_to_cmd_callback(self, data: msg.DeviceCmd):
         if ((data.target == self._name) or (data.target == 'all')):
-            rospy.loginfo("Got [ %s -> %s ]: `%s`, %x, %x, %x, %x, `%s`" %
-                          (rospy.get_caller_id(), data.target, data.msg, data.argumentA, data.argumentB, data.argumentC,
-                           data.argumentD, data.argumentString))
-            if (data.argumentString == 'w') or (data.argumentString == 'write'):
-                self.write(reg=data.argumentA, val=data.argumentB)
-            if (data.argumentString == 'r') or (data.argumentString == 'read'):
-                self.read(reg=data.argumentA)
+            rospy.loginfo("Send to %s: 0x%x(0x%x). [%s]" % (data.target, data.cmd, data.arg, data.message))
+            if data.arg != 0:
+                self.write(reg=1, val=data.arg)
+            self.write(reg=0, val=data.cmd)
 
     def publish(self, dtype="", valA=0, valB=0, valC=0, valD=0, valString="", msg_note=""):
         to_send = msg.SensorData()
-        to_send.type = dtype
+        to_send.sensor_type = dtype
         to_send.valA = valA
         to_send.valB = valB
         to_send.valC = valC
         to_send.valD = valD
         to_send.valString = valString
         to_send.message = msg_note
-        self.publisher.publish(to_send)
+        rospy.loginfo("%s published: %s, %d, %d, %d, %d, %s (%s)" %
+                      (self._name, to_send.sensor_type, to_send.valA, to_send.valB, to_send.valC, to_send.valD,
+                       to_send.valString, to_send.message))
+        self.publisher_of_sensor_data.publish(to_send)
+
+    def write(self, reg, val):
+        rospy.logdebug("write(0x%x, 0x%x) to 0x%x" % (reg, val, self._address))
+        if not self.client_i2c:
+            raise rospy.ServiceException
+        try:
+            self.client_i2c_lock.acquire(blocking=True)
+            resp = self.client_i2c("w", self._address, reg, val)
+            self.client_i2c_lock.release()
+            return resp.reg_value
+        except rospy.ServiceException as e:
+            if self.client_i2c_lock.locked:
+                self.client_i2c_lock.release()
+            rospy.logerr("Service call failed: %s" % e)
+
+    def read(self, reg):
+        rospy.logdebug("read(%x)" % (reg))
+        if not self.client_i2c:
+            raise rospy.ServiceException
+        try:
+            self.client_i2c_lock.acquire(blocking=True)
+            resp = self.client_i2c("r", self._address, reg, 0)
+            self.client_i2c_lock.release()
+            return resp.reg_value
+        except rospy.ServiceException as e:
+            if self.client_i2c_lock.locked:
+                self.client_i2c_lock.release()
+            rospy.logerr("Service call failed: %s" % e)
+
+    def mode(self):
+        s = self.read(REG_MODE)
+        return s
+
+    def cmd(self, val):
+        rospy.logdebug("Send a command :%s" % hex(val))
+        self.write(REG_CMD, val)
+
+    def cmd_stop(self):
+        self.cmd(0xA0)
 
     def poll_process(self, register, freq):
         while (1):
             try:
                 d = self.read(reg=register)
             except Exception as e:
+                rospy.logerr(str(e))
                 d = None
             if d is None:
                 d = -1
@@ -110,11 +137,12 @@ class ZkI2cDevice(object):
 
         rospy.wait_for_service(com.names.NODE_I2C_SERVER)
         ###
-        self.client = com.get.client(name=com.names.NODE_I2C_SERVER, service=srv.I2c)
-        self.subscriber = com.get.subscriber(topic_name=com.names.TOPIC_DEVICECMD,
-                                             data_class=msg.DeviceCmd,
-                                             callback=self.subscriber_callback)
-        self.publisher = com.get.publisher(topic_name=com.names.TOPIC_SENSORDATA, data_class=msg.SensorData)
+        self.client_i2c = com.get.client(name=com.names.NODE_I2C_SERVER, service=srv.I2c)
+        self.subscriber_to_cmd = com.get.subscriber(topic_name=com.names.TOPIC_DEVICECMD,
+                                                    data_class=msg.DeviceCmd,
+                                                    callback=self.subscriber_to_cmd_callback)
+        self.publisher_of_sensor_data = com.get.publisher(topic_name=com.names.TOPIC_SENSORDATA,
+                                                          data_class=msg.SensorData)
         self._start_poll()
         ###
         rospy.loginfo("[  DONE  ] Node \'%s\' is ready..." % self._name)
@@ -122,34 +150,3 @@ class ZkI2cDevice(object):
     def start(self):
         self.run()
         rospy.spin()
-
-    def write(self, reg, val):
-        rospy.logdebug("write(0x%x, 0x%x) to 0x%x" % (reg, val, self._address))
-        if not self.client:
-            raise rospy.ServiceException
-        try:
-            resp = self.client("w", self._address, reg, val)
-            return resp.reg_value
-        except rospy.ServiceException as e:
-            rospy.logerr("Service call failed: %s" % e)
-
-    def read(self, reg):
-        rospy.logdebug("read(%x)" % (reg))
-        if not self.client:
-            raise rospy.ServiceException
-        try:
-            resp = self.client("r", self._address, reg, 0)
-            return resp.reg_value
-        except rospy.ServiceException as e:
-            rospy.logerr("Service call failed: %s" % e)
-
-    def mode(self):
-        s = self.read(REG_MODE)
-        return s
-
-    def cmd(self, val):
-        rospy.logdebug("Send a command :%s" % hex(val))
-        self.write(REG_CMD, val)
-
-    def cmd_stop(self):
-        self.cmd(0xA0)
