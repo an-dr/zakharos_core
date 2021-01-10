@@ -64,6 +64,7 @@
 			"${workspaceFolder}/src/zakhar_mind_tests/src",
 			"${workspaceFolder}/src/zakhar_interpreters/src",
 		],
+		"workspace.isHidden": false,
 	},
 	"tasks": {
 		"version": "2.0.0",
