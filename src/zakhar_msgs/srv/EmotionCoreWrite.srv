@@ -1,0 +1,6 @@
+string sensor_name
+int32 value
+string temp_param_name
+int32 temp_val_per_sec
+---
+string result
