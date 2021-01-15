@@ -77,6 +77,7 @@
 				"options": {
 					"cwd": "${workspaceFolder}",
 				},
+				"problemMatcher":"$catkin-gcc"
 			},
 			{
 				"label": "Clean Build",
@@ -94,6 +95,14 @@
 				"label": "Clean",
 				"type": "shell",
 				"command": "catkin clean --yes",
+				"options": {
+					"cwd": "${workspaceFolder}",
+				},
+			},
+			{
+				"label": "Set permission",
+				"type": "shell",
+				"command": "bash ${workspaceFolder}/set_permissions.sh",
 				"options": {
 					"cwd": "${workspaceFolder}",
 				},
