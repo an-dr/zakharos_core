@@ -1,0 +1,6 @@
+<launch>
+
+    <include file="$(dirname)/low_level.launch" />
+    <node name="zakhar_emotion_core" pkg="zakhar_emotion_core" type="zakhar_emotion_core_node"/>
+
+</launch>

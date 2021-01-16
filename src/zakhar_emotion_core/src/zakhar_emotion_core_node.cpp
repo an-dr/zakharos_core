@@ -39,13 +39,13 @@ int main(int argc, char **argv) {
     ros::NodeHandle n;
 
     ros::ServiceServer emotion_core_write_srv           = n.advertiseService("EmotionCoreWrite", EmotionCoreWrite_handler);
-    ros::ServiceServer emotion_core_data_descriptor_srv = n.advertiseService("EmotionCoreDataDescriptor.", EmotionCoreDataDescriptor_handler);
+    ros::ServiceServer emotion_core_data_descriptor_srv = n.advertiseService("EmotionCoreDataDescriptor", EmotionCoreDataDescriptor_handler);
     ros::Publisher emotion_core_emotion_params_pub      = n.advertise<zakhar_msgs::EmotionParams>("/EmotionParams", 10);
     ros::Rate loop_rate(10);
     while (ros::ok()) {
         zakhar_msgs::EmotionParams msg;
         FillMsg(msg);
-        ROS_INFO("%s", msg.params_json);
+        ROS_INFO("%s", msg.params_json.c_str());
         emotion_core_emotion_params_pub.publish(msg);
         ros::spinOnce();
         loop_rate.sleep();
