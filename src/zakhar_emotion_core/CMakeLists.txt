@@ -12,6 +12,8 @@ add_executable(${PROJECT_NAME}_node src/zakhar_emotion_core_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} )
 
+target_compile_options(${PROJECT_NAME}_node PRIVATE -Wno-psabi) # suppress notes of json library (apparently arm-only)
+
 #############
 ## Install ##
 #############

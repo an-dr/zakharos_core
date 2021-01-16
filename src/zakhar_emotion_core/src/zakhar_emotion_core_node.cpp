@@ -11,9 +11,14 @@
 // *************************************************************************
 
 #include "ros/ros.h"
+#include "nlohmann/json.hpp"
 #include "zakhar_msgs/EmotionCoreDataDescriptor.h"
 #include "zakhar_msgs/EmotionCoreWrite.h"
 #include "zakhar_msgs/EmotionParams.h"
+#include <string>
+
+using namespace std;
+using json = nlohmann::json;
 
 
 bool EmotionCoreWrite_handler(zakhar_msgs::EmotionCoreWrite::Request &req,
@@ -29,7 +34,11 @@ bool EmotionCoreDataDescriptor_handler(zakhar_msgs::EmotionCoreDataDescriptor::R
 }
 
 bool FillMsg(zakhar_msgs::EmotionParams &msg){
-    msg.params_json = "{}";
+    json p;
+    p["param1"] = 16;
+    p["param2"] = -1;
+    string s = p.dump();
+    msg.params_json = s;
     return true;
 }
 
