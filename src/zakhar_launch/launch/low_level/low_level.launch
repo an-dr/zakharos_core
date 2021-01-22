@@ -1,6 +1,0 @@
-<launch>
-
-    <include file="$(dirname)/low_level/ll_devices.launch" />
-    <include file="$(dirname)/low_level/ll_interpreters.launch" />
-
-</launch>

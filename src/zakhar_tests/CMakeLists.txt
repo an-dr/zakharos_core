@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(zakhar_mind_tests)
+project(zakhar_tests)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS

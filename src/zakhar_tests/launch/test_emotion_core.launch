@@ -1,6 +1,6 @@
 <launch>
 
-    <include file="$(dirname)/low_level.launch" />
+    <include file="$(find zakhar_launch)/launch/low_level.launch" />
     <node name="zakhar_emotion_core" pkg="zakhar_emotion_core" type="zakhar_emotion_core_node"/>
     <node name="ego_emotion_reader" pkg="zakhar_mind_tests" type="ego_emotion_reader.py"/>
 
