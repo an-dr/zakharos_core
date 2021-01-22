@@ -24,8 +24,8 @@ class EgoLikeNode:
         rospy.loginfo("From SensorInterpreter: %s:%s" % (perception_concept.symbol, perception_concept.modificator))
 
     def emotion_callback(self, params: msg.EmotionParams):
-        params_dict = json.loads(params)
-        rospy.loginfo(f"Params: ${params_dict}")
+        params_dict = json.loads(params.params_json)
+        rospy.loginfo(f"Params: ${str(params_dict)}")
 
     def _init_communication(self):
         rospy.logdebug("Client \'%s\' is starting..." % self.name)
