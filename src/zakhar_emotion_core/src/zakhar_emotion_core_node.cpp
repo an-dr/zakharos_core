@@ -23,12 +23,14 @@ using json = nlohmann::json;
 
 bool EmotionCoreWrite_handler(zakhar_msgs::EmotionCoreWrite::Request &req,
                               zakhar_msgs::EmotionCoreWrite::Response &res) {
+    ROS_INFO("%s", __func__);
     res.result = "done";
     return true;
 }
 
 bool EmotionCoreDataDescriptor_handler(zakhar_msgs::EmotionCoreDataDescriptor::Request &req,
                                        zakhar_msgs::EmotionCoreDataDescriptor::Response &res) {
+    ROS_INFO("%s", __func__);
     res.result = "done";
     return true;
 }
