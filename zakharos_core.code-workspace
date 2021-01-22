@@ -132,9 +132,14 @@
 				"command": "pkill python",
 			},
 			{
-				"label": "Update zakhar-pycore",
+				"label": "Update zakhar-pycore (pypi.org)",
 				"type": "shell",
 				"command": "python3 -m pip install --no-cache-dir --force-reinstall --user zakhar_pycore",
+			},
+			{
+				"label": "Update zakhar-pycore (GitHub)",
+				"type": "shell",
+				"command": "python3 -m pip install --no-cache-dir --force-reinstall --user git+https://github.com/an-dr/zakhar_pycore",
 			},
 			{
 				"label": "Start roscore",
