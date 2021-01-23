@@ -1,7 +1,8 @@
 import rospy
 from os.path import basename, splitext
 import zakhar_common as com
-from zakhar_msgs import msg
+from zakhar_msgs import msg, srv
+from zakhar_pycore import constants as zc
 
 # TODO: move data interpretation from sensors to here
 
@@ -11,6 +12,8 @@ class Data2ConceptInterpreter:
         self.name = splitext(basename(__file__))[0]
         self.publisher_to_egos = None
         self.subscriber_to_devices = None
+        self.client_of_emotion_core_write = None
+        self.client_of_emotion_data_descriptor = None
 
     def publish(self, symbol, modificator):
         to_send = msg.PerceptionConcept()
@@ -32,9 +35,13 @@ class Data2ConceptInterpreter:
                 self.publish("obstacle", str(sensor_data.valString))
 
     def sensor_data_handler(self, data):
-        rospy.logdebug(
+        rospy.loginfo(
             "Got SensorData [sensor_type: %s, valA: 0x%x, valB: 0x%x, valC: 0x%x, valD: 0x%x, valString: %s, msg: \'%s\'"
             % (data.sensor_type, data.valA, data.valB, data.valC, data.valD, data.valString, data.message))
+        write_msg = srv.EmotionCoreWriteRequest()
+        write_msg.sensor_name = data.sensor_type
+        write_msg.value = data.valA
+        self.client_of_emotion_core_write(write_msg)
         self.sensor_data_handler_photoresistor(data)
         self.sensor_data_handler_sound_distance(data)
 
@@ -47,6 +54,10 @@ class Data2ConceptInterpreter:
         self.subscriber_to_devices = com.get.subscriber(topic_name=com.names.TOPIC_SENSORDATA,
                                                         data_class=msg.SensorData,
                                                         callback=self.sensor_data_handler)
+        self.client_of_emotion_core_write = com.get.client(name=zc.ROS.SERVICES.EMOTIONCORE_WRITE,
+                                                           service=srv.EmotionCoreWrite)
+        self.client_of_emotion_data_descriptor = com.get.client(name=zc.ROS.SERVICES.EMOTIONCORE_DATADSC,
+                                                                service=srv.EmotionCoreDataDescriptor)
         rospy.loginfo("[  DONE  ] Node \'%s\' is ready..." % self.name)
 
 

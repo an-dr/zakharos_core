@@ -17,28 +17,32 @@
 #include "zakhar_msgs/EmotionParams.h"
 #include <string>
 
+
+#define DEFAULT_EMOTION_PARAM_RATE 1
+
 using namespace std;
 using json = nlohmann::json;
 
 
 bool EmotionCoreWrite_handler(zakhar_msgs::EmotionCoreWrite::Request &req,
                               zakhar_msgs::EmotionCoreWrite::Response &res) {
-    ROS_INFO("%s", __func__);
+    ROS_INFO("%s\n", __func__);
     res.result = "done";
     return true;
 }
 
 bool EmotionCoreDataDescriptor_handler(zakhar_msgs::EmotionCoreDataDescriptor::Request &req,
                                        zakhar_msgs::EmotionCoreDataDescriptor::Response &res) {
-    ROS_INFO("%s", __func__);
+    ROS_INFO("%s\n", __func__);
     res.result = "done";
     return true;
 }
 
+static json p;
+
 bool FillMsg(zakhar_msgs::EmotionParams &msg){
-    json p;
-    p["param1"] = 16;
-    p["param2"] = -1;
+    // p["param1"] += 1;
+    // p["param2"] += 2;
     string s = p.dump();
     msg.params_json = s;
     return true;
@@ -48,15 +52,16 @@ bool FillMsg(zakhar_msgs::EmotionParams &msg){
 int main(int argc, char **argv) {
     ros::init(argc, argv, "zakhar_emotion_core");
     ros::NodeHandle n;
-
+    p["param1"] = 16;
+    p["param2"] = -1;
     ros::ServiceServer emotion_core_write_srv           = n.advertiseService("EmotionCoreWrite", EmotionCoreWrite_handler);
     ros::ServiceServer emotion_core_data_descriptor_srv = n.advertiseService("EmotionCoreDataDescriptor", EmotionCoreDataDescriptor_handler);
     ros::Publisher emotion_core_emotion_params_pub      = n.advertise<zakhar_msgs::EmotionParams>("/EmotionParams", 10);
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(DEFAULT_EMOTION_PARAM_RATE);
     while (ros::ok()) {
         zakhar_msgs::EmotionParams msg;
         FillMsg(msg);
-        ROS_INFO("%s", msg.params_json.c_str());
+        ROS_INFO("%s\n", msg.params_json.c_str());
         emotion_core_emotion_params_pub.publish(msg);
         ros::spinOnce();
         loop_rate.sleep();
