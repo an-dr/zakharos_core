@@ -25,7 +25,10 @@ class Concept2CommandsInterpreterAbstract:
 
     def command_concept_handler(self, req: srv.CommandConceptRequest) -> srv.CommandConceptResponse:
         concept = req.symbol
-        mod = req.modificator
+        raw_mod = req.modifier
+        half_raw_mod = (x.strip().strip("'").strip("\"") for x in raw_mod.strip("(").strip(")").split(","))
+        mod = tuple(half_raw_mod)
+
         ego_type = req.ego_type
         rospy.loginfo("Got %s with source type: %d" % (concept, ego_type))
 
@@ -40,7 +43,7 @@ class Concept2CommandsInterpreterAbstract:
             else:
                 try:
                     rospy.logdebug("Executing...")
-                    d = threading.Thread(name=concept, target=method_to_call, kwargs={"modificator": mod})
+                    d = threading.Thread(name=concept, target=method_to_call, kwargs={"modifier": mod})
                     d.setDaemon(True)
                     d.start()
                     rospy.loginfo("Executed %s" % (str(concept)))
@@ -55,8 +58,8 @@ class Concept2CommandsInterpreterAbstract:
             return srv.CommandConceptResponse(result=r)
 
     def sensor_callback(self, data: msg.PerceptionConcept):
-        rospy.logdebug("From SensorInterpreter: %s:%s" % (data.symbol, data.modificator))
-        self.data[data.symbol] = data.modificator
+        rospy.logdebug("From SensorInterpreter: %s:%s" % (data.symbol, data.modifier))
+        self.data[data.symbol] = data.modifier
         rospy.logdebug(self.data)
 
     def start(self):

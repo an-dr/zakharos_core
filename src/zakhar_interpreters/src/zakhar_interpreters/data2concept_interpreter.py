@@ -15,12 +15,12 @@ class Data2ConceptInterpreter:
         self.client_of_emotion_core_write = None
         self.client_of_emotion_data_descriptor = None
 
-    def publish(self, symbol, modificator):
+    def publish(self, symbol, modifier):
         to_send = msg.PerceptionConcept()
         to_send.symbol = symbol
-        to_send.modificator = modificator
+        to_send.modifier = modifier
         self.publisher_to_egos.publish(to_send)
-        rospy.loginfo("Sent [%s, %s]" % (symbol, modificator))
+        rospy.loginfo("Sent [%s, %s]" % (symbol, modifier))
 
     def sensor_data_handler_photoresistor(self, sensor_data: msg.SensorData):
         if sensor_data.sensor_type == "photoresistor":
@@ -41,7 +41,10 @@ class Data2ConceptInterpreter:
         write_msg = srv.EmotionCoreWriteRequest()
         write_msg.sensor_name = data.sensor_type
         write_msg.value = data.valA
-        self.client_of_emotion_core_write(write_msg)
+        try:
+            self.client_of_emotion_core_write(write_msg)
+        except rospy.ServiceException:
+            rospy.logwarn("Service %s did not process request. Is it running?" % zc.ROS.SERVICES.EMOTIONCORE_WRITE)
         self.sensor_data_handler_photoresistor(data)
         self.sensor_data_handler_sound_distance(data)
 

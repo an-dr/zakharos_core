@@ -1,6 +1,6 @@
 from os.path import basename, splitext
 from .concept2commands_interpreter_abstract import Concept2CommandsInterpreterAbstract
-from .concepts import *
+from .concepts import ConceptsBacicReactions, ConceptsPanic, ConceptsMove
 import rospy
 
 

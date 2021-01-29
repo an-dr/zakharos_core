@@ -21,7 +21,7 @@ class EgoLikeNode:
         self.subscriber_PerceptionConcept = None
 
     def sensor_callback(self, perception_concept: msg.PerceptionConcept):
-        rospy.loginfo("From SensorInterpreter: %s:%s" % (perception_concept.symbol, perception_concept.modificator))
+        rospy.loginfo("From SensorInterpreter: %s:%s" % (perception_concept.symbol, perception_concept.modifier))
 
     def emotion_callback(self, params: msg.EmotionParams):
         params_dict = json.loads(params.params_json)
@@ -48,12 +48,12 @@ class EgoLikeNode:
     def main(self):
         pass
 
-    def to_will(self, symbol, modificator=""):
-        rospy.loginfo("Ego is willing: %s:%s" % (symbol, modificator))
+    def to_will(self, symbol, modifier=()):
+        rospy.loginfo("Ego is willing: %s:%s" % (symbol, str(modifier)))
         if not self.client_CommandConcept:
             raise rospy.ServiceException
         try:
-            resp = self.client_CommandConcept(self.ego_type, symbol, modificator)
+            resp = self.client_CommandConcept(self.ego_type, symbol, str(modifier))
             return resp.result
         except rospy.ServiceException as e:
             print("Service call failed: %s" % e)

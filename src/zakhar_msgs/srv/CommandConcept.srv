@@ -1,5 +1,5 @@
 uint32 ego_type
 string symbol
-string modificator
+string modifier
 ---
 string result

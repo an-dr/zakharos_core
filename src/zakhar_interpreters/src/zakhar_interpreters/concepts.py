@@ -5,37 +5,12 @@ from zakhar_pycore.constants import CMD
 
 
 class ConceptsMove(Concept2CommandsInterpreterAbstract):
-    def move_forward(self, modificator=""):
-        rospy.loginfo("move_forward")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.FORWARD)
-        self.exec_in_progress = False
-
-    def move_backward(self, modificator=""):
-        rospy.loginfo("move_stop")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        self.exec_in_progress = False
-
-    def move_left(self, modificator=""):
-        rospy.loginfo("move_left")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.LEFT)
-        self.exec_in_progress = False
-
-    def move_right(self, modificator=""):
-        rospy.loginfo("move_right")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.RIGHT)
-        self.exec_in_progress = False
-
-    def move_stop(self, modificator=""):
-        rospy.loginfo("move_stop")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.STOP)
-        self.exec_in_progress = False
-
-    def move_shiver(self, modificator=""):
+    def move_shiver(self, modifier=""):
         rospy.loginfo("move_shiver")
         self.publish(target="moving_platform", cmd=CMD.MOVE.SHIVER)
         self.exec_in_progress = False
 
-    def move_avoid_front(self, modificator=""):
+    def move_avoid_front(self, modifier=""):
         rospy.loginfo("move_avoid_front")
         self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
         sleep(.2)
@@ -45,7 +20,7 @@ class ConceptsMove(Concept2CommandsInterpreterAbstract):
         sleep(.2)
         self.exec_in_progress = False
 
-    def move_avoid_left(self, modificator=""):
+    def move_avoid_left(self, modifier=""):
         rospy.loginfo("move_avoid_left")
         self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
         sleep(.2)
@@ -59,7 +34,7 @@ class ConceptsMove(Concept2CommandsInterpreterAbstract):
         sleep(1)
         self.exec_in_progress = False
 
-    def move_avoid_right(self, modificator=""):
+    def move_avoid_right(self, modifier=""):
         rospy.loginfo("move_avoid_right")
         self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
         sleep(.2)
@@ -73,9 +48,35 @@ class ConceptsMove(Concept2CommandsInterpreterAbstract):
         sleep(1)
         self.exec_in_progress = False
 
+    def move(self, modifier=()):
+        rospy.loginfo("move %s" % str(modifier))
+        # speed
+        if "slower" in modifier:
+            self.publish(target="moving_platform", cmd=CMD.MOVE.SPEED2)
+        if "slow" in modifier:
+            self.publish(target="moving_platform", cmd=CMD.MOVE.SPEED1)
+
+        for direction in modifier:
+            if direction == "forward":
+                self.publish(target="moving_platform", cmd=CMD.MOVE.FORWARD)
+            if direction == "backward":
+                self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+            if direction == "left":
+                self.publish(target="moving_platform", cmd=CMD.MOVE.LEFT)
+            if direction == "right":
+                self.publish(target="moving_platform", cmd=CMD.MOVE.RIGHT)
+            if direction == "stop":
+                self.publish(target="moving_platform", cmd=CMD.MOVE.STOP)
+
+        # restore speed
+        if ("slower" in modifier) or ("slow" in modifier):
+            self.publish(target="moving_platform", cmd=CMD.MOVE.SPEED3)
+
+        self.exec_in_progress = False
+
 
 class ConceptsPanic(Concept2CommandsInterpreterAbstract):
-    def basic_panic(self, modificator=""):
+    def basic_panic(self, modifier=""):
         rospy.loginfo("basic_panic")
         self.publish(target="face_platform", cmd=CMD.FACE.SAD)
 
@@ -99,12 +100,12 @@ class ConceptsPanic(Concept2CommandsInterpreterAbstract):
 
 
 class ConceptsBacicReactions(Concept2CommandsInterpreterAbstract):
-    def hello(self, modificator=""):
+    def hello(self, modifier=""):
         rospy.loginfo("hello")
         self.publish(target="face_platform", cmd=CMD.FACE.CALM)
         self.exec_in_progress = False
 
-    def bye(self, modificator=""):
+    def bye(self, modifier=""):
         rospy.loginfo("bye")
         self.publish(target="face_platform", cmd=CMD.FACE.BLINK)
         self.exec_in_progress = False

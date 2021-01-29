@@ -10,11 +10,11 @@ class EgoMotorsTest(EgoLikeNode):
 
     def main(self):
         while (1):
-            self.to_will("move_forward")
+            self.to_will("move", modifier="forward")
             sleep(1)
             self.to_will("move_shiver")
             sleep(2)
-            self.to_will("move_stop")
+            self.to_will("move", modifier="stop")
             sleep(1)
 
 
