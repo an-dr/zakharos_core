@@ -13,7 +13,7 @@ class EgoSmallResearcher(EgoLikeNode):
             for i in range(6):  # 300 ms of right
                 self.to_will("move", ("forward"))
                 sleep(.05)
-            self.to_will("move_stop")
+            self.to_will("move", ("stop"))
             sleep(1)
             for i in range(6):  # 300 ms of right
                 self.to_will("move", ("right"))

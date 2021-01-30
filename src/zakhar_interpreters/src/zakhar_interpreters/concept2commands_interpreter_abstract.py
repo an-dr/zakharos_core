@@ -2,7 +2,8 @@ import rospy
 import threading
 import zakhar_common as com
 from zakhar_msgs import msg, srv
-from typing import Union
+from typing import Union, List, Any
+from .command_concept_abstract import CommandConceptAbstract
 
 
 class Concept2CommandsInterpreterAbstract:
@@ -13,6 +14,7 @@ class Concept2CommandsInterpreterAbstract:
         self.server_of_command_concepts = None  # type: Union[rospy.Service, None]
         self.exec_in_progress = False
         self.data = {}
+        self.concepts = []  # type: List[CommandConceptAbstract]
 
     def publish(self, cmd: int, arg: int = 0, target: str = "all", message: str = ""):
         to_send = msg.DeviceCmd()
@@ -22,6 +24,18 @@ class Concept2CommandsInterpreterAbstract:
         to_send.message = message
         self.publisher_to_devices.publish(to_send)
         rospy.logdebug("Send to %s: 0x%x(0x%x). [%s]" % (target, cmd, arg, message))
+
+    def add_concept(self, cc: CommandConceptAbstract):
+        # type check
+        if not isinstance(cc, type) and cc.__name__ == CommandConceptAbstract.__name__:
+            raise TypeError("Type of cc is %s" % str(type(cc)))
+
+        # check uniqueness
+        for i in self.concepts:
+            if i.name == cc.name:
+                raise ValueError("A concept with the same name is already present")
+
+        self.concepts.append(cc)
 
     def command_concept_handler(self, req: srv.CommandConceptRequest) -> srv.CommandConceptResponse:
         concept = req.symbol
@@ -36,14 +50,29 @@ class Concept2CommandsInterpreterAbstract:
             self.exec_in_progress = True
             rospy.logdebug("Object: %s; Method: %s" % (str(self), str(concept)))
 
-            method_to_call = getattr(self, concept, None)
-            if method_to_call is None:
+            to_call = None  # type: Any[None, CommandConceptAbstract]
+            for i in self.concepts:
+                if i.name == concept:
+                    to_call = i
+
+            if to_call is None:  # TODO: delete
+                to_call = getattr(self, concept, None)
+
+            if to_call is None:
                 rospy.logerr("Unknown concept")
                 res = "no concept"
             else:
                 try:
                     rospy.logdebug("Executing...")
-                    d = threading.Thread(name=concept, target=method_to_call, kwargs={"modifier": mod})
+                    if isinstance(to_call, type):
+                        d = threading.Thread(name=concept,
+                                             target=to_call.execute,
+                                             kwargs={
+                                                 "c2c": self,
+                                                 "modifier": mod
+                                             })
+                    else:  # TODO: delete
+                        d = threading.Thread(name=concept, target=to_call, kwargs={"modifier": mod})
                     d.setDaemon(True)
                     d.start()
                     rospy.loginfo("Executed %s" % (str(concept)))

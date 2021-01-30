@@ -1,6 +1,6 @@
 from os.path import basename, splitext
 from .concept2commands_interpreter_abstract import Concept2CommandsInterpreterAbstract
-from .concepts import ConceptsBacicReactions, ConceptsPanic, ConceptsMove
+from .concepts import ConceptsBacicReactions, ConceptsPanic, ConceptsMove, Move
 import rospy
 
 
@@ -12,5 +12,6 @@ class Concept2CommandsInterpreter(ConceptsBacicReactions, ConceptsPanic, Concept
 
 def start():
     obj = Concept2CommandsInterpreter()
+    obj.add_concept(Move)
     obj.start()
     rospy.spin()

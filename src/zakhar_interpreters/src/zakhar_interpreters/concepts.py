@@ -1,7 +1,44 @@
 import rospy
 from time import sleep
 from .concept2commands_interpreter_abstract import Concept2CommandsInterpreterAbstract
+from .command_concept_abstract import CommandConceptAbstract
 from zakhar_pycore.constants import CMD
+from typing import Any
+
+
+class Move(CommandConceptAbstract):
+    name = "move"
+
+    def action(self, c2c: Concept2CommandsInterpreterAbstract, modifier: list = [], emotion_params: dict = {}):
+        """ Interaction with devices """
+        rospy.loginfo("move %s" % str(modifier))
+        # speed
+        if "slower" in modifier:
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.SPEED2)
+        if "slow" in modifier:
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.SPEED1)
+
+        for direction in modifier:
+            if direction == "forward":
+                c2c.publish(target="moving_platform", cmd=CMD.MOVE.FORWARD)
+            if direction == "backward":
+                c2c.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+            if direction == "left":
+                c2c.publish(target="moving_platform", cmd=CMD.MOVE.LEFT)
+            if direction == "right":
+                c2c.publish(target="moving_platform", cmd=CMD.MOVE.RIGHT)
+            if direction == "stop":
+                c2c.publish(target="moving_platform", cmd=CMD.MOVE.STOP)
+
+        # restore speed
+        if ("slower" in modifier) or ("slow" in modifier):
+            self.publish(target="moving_platform", cmd=CMD.MOVE.SPEED3)
+
+        c2c.exec_in_progress = False
+
+    def modifier_analysis(cls, modifier: list = [], emotion_params: dict = {}) -> bool:
+        """ Adds modifiers if necessary nased on emotions, finds contradictions """
+        return True
 
 
 class ConceptsMove(Concept2CommandsInterpreterAbstract):
