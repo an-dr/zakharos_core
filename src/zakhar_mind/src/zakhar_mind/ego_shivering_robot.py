@@ -10,7 +10,7 @@ class EgoShiveringRobot(EgoLikeNode):
 
     def main(self):
         while (1):
-            self.to_will("move_shiver")
+            self.to_will("shiver")
             sleep(5)
 
 

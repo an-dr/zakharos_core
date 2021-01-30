@@ -13,12 +13,12 @@ class InstinctAvoidCloseObjects(EgoLikeNode):
             mod = perception_concept.modifier
             rospy.loginfo("Trigger! Mod: %s" % mod)
             if (("c" in mod) & 1) or (("l" in mod) and ("r" in mod)):
-                self.to_will("move_avoid_front")
+                self.to_will("avoid", ("front"))
             else:
                 if "l" in mod:
-                    self.to_will("move_avoid_left")
+                    self.to_will("avoid", ("left"))
                 if "r" in mod:
-                    self.to_will("move_avoid_right")
+                    self.to_will("avoid", ("right"))
 
 
 instinct = InstinctAvoidCloseObjects()

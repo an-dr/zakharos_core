@@ -1,148 +1,155 @@
 import rospy
 from time import sleep
-from .concept2commands_interpreter_abstract import Concept2CommandsInterpreterAbstract
 from .command_concept_abstract import CommandConceptAbstract
 from zakhar_pycore.constants import CMD
-from typing import Any
+from typing import TYPE_CHECKING
+
+# to avoid circular import:
+#   1. TYPE_CHECKING is always false on runtime
+#   2. used strings in typing. See: https://www.python.org/dev/peps/pep-0484/#forward-references
+if TYPE_CHECKING:
+    from .concept2commands_interpreter import Concept2CommandsInterpreter
 
 
 class Move(CommandConceptAbstract):
     name = "move"
 
-    def action(self, c2c: Concept2CommandsInterpreterAbstract, modifier: list = [], emotion_params: dict = {}):
+    class modifiers:
+        forward = "forward"
+        backward = "backward"
+        left = "left"
+        right = "right"
+        slower = "slower"
+        slow = "slow"
+        stop = "stop"
+
+    def modifier_analysis(cls, modifier: list = [], emotion_params: dict = {}) -> bool:
+        """ Adds modifiers if necessary nased on emotions, finds contradictions """
+        return True
+
+    def action(cls, c2c: "Concept2CommandsInterpreter", modifier: list = [], emotion_params: dict = {}):
         """ Interaction with devices """
         rospy.loginfo("move %s" % str(modifier))
         # speed
-        if "slower" in modifier:
+        if cls.modifiers.slower in modifier:
             c2c.publish(target="moving_platform", cmd=CMD.MOVE.SPEED2)
-        if "slow" in modifier:
+        if cls.modifiers.slow in modifier:
             c2c.publish(target="moving_platform", cmd=CMD.MOVE.SPEED1)
 
         for direction in modifier:
-            if direction == "forward":
+            if direction == cls.modifiers.forward:
                 c2c.publish(target="moving_platform", cmd=CMD.MOVE.FORWARD)
-            if direction == "backward":
+            if direction == cls.modifiers.backward:
                 c2c.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-            if direction == "left":
+            if direction == cls.modifiers.left:
                 c2c.publish(target="moving_platform", cmd=CMD.MOVE.LEFT)
-            if direction == "right":
+            if direction == cls.modifiers.right:
                 c2c.publish(target="moving_platform", cmd=CMD.MOVE.RIGHT)
-            if direction == "stop":
+            if direction == cls.modifiers.stop:
                 c2c.publish(target="moving_platform", cmd=CMD.MOVE.STOP)
 
         # restore speed
-        if ("slower" in modifier) or ("slow" in modifier):
-            self.publish(target="moving_platform", cmd=CMD.MOVE.SPEED3)
+        if (cls.modifiers.slower in modifier) or (cls.modifiers.slow in modifier):
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.SPEED3)
 
-        c2c.exec_in_progress = False
+
+
+class Shiver(CommandConceptAbstract):
+    name = "shiver"
+
+    def action(cls, c2c: "Concept2CommandsInterpreter", modifier: list = [], emotion_params: dict = {}):
+        """ Interaction with devices """
+        c2c.publish(target="moving_platform", cmd=CMD.MOVE.SHIVER)
+
 
     def modifier_analysis(cls, modifier: list = [], emotion_params: dict = {}) -> bool:
         """ Adds modifiers if necessary nased on emotions, finds contradictions """
         return True
 
 
-class ConceptsMove(Concept2CommandsInterpreterAbstract):
-    def move_shiver(self, modifier=""):
-        rospy.loginfo("move_shiver")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.SHIVER)
-        self.exec_in_progress = False
 
-    def move_avoid_front(self, modifier=""):
-        rospy.loginfo("move_avoid_front")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.exec_in_progress = False
+class Avoid(CommandConceptAbstract):
+    name = "avoid"
 
-    def move_avoid_left(self, modifier=""):
-        rospy.loginfo("move_avoid_left")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.RIGHT, arg=60)
-        sleep(1)
-        self.exec_in_progress = False
+    class modifiers:
+        front = "front"
+        left = "left"
+        right = "right"
 
-    def move_avoid_right(self, modifier=""):
-        rospy.loginfo("move_avoid_right")
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-        sleep(.2)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.LEFT, arg=60)
-        sleep(1)
-        self.exec_in_progress = False
+    def modifier_analysis(cls, modifier: list = [], emotion_params: dict = {}) -> bool:
+        """ Adds modifiers if necessary nased on emotions, finds contradictions """
+        if (("left" in modifier) or ("right" in modifier)) and not ("front" in modifier):
+            modifier.append("front")
 
-    def move(self, modifier=()):
-        rospy.loginfo("move %s" % str(modifier))
-        # speed
-        if "slower" in modifier:
-            self.publish(target="moving_platform", cmd=CMD.MOVE.SPEED2)
-        if "slow" in modifier:
-            self.publish(target="moving_platform", cmd=CMD.MOVE.SPEED1)
+        if ("left" in modifier) and ("right" in modifier):
+            modifier.remove("left")
+            modifier.remove("right")
+        return True
 
-        for direction in modifier:
-            if direction == "forward":
-                self.publish(target="moving_platform", cmd=CMD.MOVE.FORWARD)
-            if direction == "backward":
-                self.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
-            if direction == "left":
-                self.publish(target="moving_platform", cmd=CMD.MOVE.LEFT)
-            if direction == "right":
-                self.publish(target="moving_platform", cmd=CMD.MOVE.RIGHT)
-            if direction == "stop":
-                self.publish(target="moving_platform", cmd=CMD.MOVE.STOP)
-
-        # restore speed
-        if ("slower" in modifier) or ("slow" in modifier):
-            self.publish(target="moving_platform", cmd=CMD.MOVE.SPEED3)
-
-        self.exec_in_progress = False
+    def action(cls, c2c: "Concept2CommandsInterpreter", modifier: list = [], emotion_params: dict = {}):
+        """ Interaction with devices """
+        if cls.modifiers.front in modifier:
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+            sleep(.2)
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+            sleep(.2)
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.BACKWARD)
+            sleep(.2)
+        if cls.modifiers.left in modifier:
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.RIGHT, arg=60)
+            sleep(1)
+        if cls.modifiers.right in modifier:
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.LEFT, arg=60)
+            sleep(1)
 
 
-class ConceptsPanic(Concept2CommandsInterpreterAbstract):
-    def basic_panic(self, modifier=""):
+
+class BasicPanic(CommandConceptAbstract):
+    name = "basic_panic"
+
+    def modifier_analysis(cls, modifier: list = [], emotion_params: dict = {}) -> bool:
+        """ Adds modifiers if necessary nased on emotions, finds contradictions """
+        return True
+
+    def action(cls, c2c: "Concept2CommandsInterpreter", modifier: list = [], emotion_params: dict = {}):
+        """ Interaction with devices """
         rospy.loginfo("basic_panic")
-        self.publish(target="face_platform", cmd=CMD.FACE.SAD)
+        c2c.publish(target="face_platform", cmd=CMD.FACE.SAD)
 
-        panic_light = int(self.data.get("light", 0))
+        panic_light = int(c2c.data.get("light", 0))
         current_light = panic_light
         rospy.loginfo("panic_light : 0x%x" % panic_light)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.SHIVER)
+        c2c.publish(target="moving_platform", cmd=CMD.MOVE.SHIVER)
         sleep(2)
         while not (current_light > 1.2 * panic_light):
-            self.publish(target="moving_platform", cmd=CMD.MOVE.FORWARD)
+            c2c.publish(target="moving_platform", cmd=CMD.MOVE.FORWARD)
             sleep(.05)
-            current_light = int(self.data.get("light", 0xFFFFFFFF))
+            current_light = int(c2c.data.get("light", 0xFFFFFFFF))
             rospy.loginfo("current_light : 0x%x" % current_light)
         rospy.loginfo("out of loop")
         sleep(.5)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.STOP)
+        c2c.publish(target="moving_platform", cmd=CMD.MOVE.STOP)
         sleep(.5)
-        self.publish(target="moving_platform", cmd=CMD.MOVE.SHIVER)
-        self.publish(target="face_platform", cmd=CMD.FACE.CALM)
-        self.exec_in_progress = False
+        c2c.publish(target="moving_platform", cmd=CMD.MOVE.SHIVER)
+        c2c.publish(target="face_platform", cmd=CMD.FACE.CALM)
 
 
-class ConceptsBacicReactions(Concept2CommandsInterpreterAbstract):
-    def hello(self, modifier=""):
-        rospy.loginfo("hello")
-        self.publish(target="face_platform", cmd=CMD.FACE.CALM)
-        self.exec_in_progress = False
 
-    def bye(self, modifier=""):
-        rospy.loginfo("bye")
-        self.publish(target="face_platform", cmd=CMD.FACE.BLINK)
-        self.exec_in_progress = False
+class Express(CommandConceptAbstract):
+    name = "express"
+
+    class modifiers:
+        hello = "hello"
+        bye = "bye"
+
+    def action(cls, c2c: "Concept2CommandsInterpreter", modifier: list = [], emotion_params: dict = {}):
+        """ Interaction with devices """
+        if cls.modifiers.hello in modifier:
+            c2c.publish(target="face_platform", cmd=CMD.FACE.CALM)
+        elif cls.modifiers.bye in modifier:
+            c2c.publish(target="face_platform", cmd=CMD.FACE.BLINK)
+
+
+    def modifier_analysis(cls, modifier: list = [], emotion_params: dict = {}) -> bool:
+        """ Adds modifiers if necessary nased on emotions, finds contradictions """
+        return True
