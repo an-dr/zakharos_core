@@ -1,6 +1,8 @@
 <launch>
 
     <include file="$(dirname)/low_level.launch" />
+    <param name="emotion_core_enable" type="bool" value="true" />
+    <node name="zakhar_emotion_core" pkg="zakhar_emotion_core" type="zakhar_emotion_core_node"/>
     <node name="ego_small_researcher" pkg="zakhar_mind" type="ego_small_researcher.py"/>
     <node name="instinct_bird_panic" pkg="zakhar_mind" type="instinct_bird_panic.py"/>
     <node name="reflex_avoid_close_objects" pkg="zakhar_mind" type="reflex_avoid_close_objects.py"/>

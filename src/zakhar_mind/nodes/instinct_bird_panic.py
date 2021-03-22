@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 import rospy
-from zakhar_mind.instinct_bird_panic import instinct
+from zakhar_mind import instinct_bird_panic
 
 
-if __name__ == '__main__':
-    instinct.start()
-    rospy.spin()
+instinct_bird_panic.node()
+rospy.spin()

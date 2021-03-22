@@ -3,6 +3,7 @@ import rospy
 from zakhar_mind.ego_like import EgoLikeNode
 from time import sleep
 
+
 class EgoFaceTest(EgoLikeNode):
     def __init__(self, name="EgoFaceTest"):
         EgoLikeNode.__init__(self, name=name)
@@ -13,6 +14,7 @@ class EgoFaceTest(EgoLikeNode):
             sleep(1)
             self.to_will("bye")
             sleep(1)
+
 
 ego = EgoFaceTest()
 
