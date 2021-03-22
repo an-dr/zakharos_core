@@ -1,6 +1,6 @@
 <launch>
 
-    <include file="$(dirname)/low_level.launch" />
+    <include file="$(find zakhar_launch)/launch/low_level.launch" />
     <node name="ego_face_test" pkg="zakhar_mind_tests" type="ego_face_test.py"/>
 
 </launch>

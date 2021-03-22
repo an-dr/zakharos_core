@@ -1,25 +1,21 @@
 from time import sleep
-import zakhar_common as com
-import zakhar_i2c_devices as dev
-from .ego_like import EgoLikeNode
+from .mind_classes import EgoNode
 
 
-class EgoSmallResearcher(EgoLikeNode):
-    def __init__(self, name="EgoSmallResearcher"):
-        EgoLikeNode.__init__(self, name=name)
-
+class Node(EgoNode):
     def main(self):
         while (1):
-            for i in range(6): # 300 ms of right
-                self.to_will("move_forward")
+            for i in range(6):  # 300 ms of right
+                self.to_will("move", ("forward"))
                 sleep(.05)
-            self.to_will("move_stop")
+            self.to_will("move", ("stop"))
             sleep(1)
             for i in range(6):  # 300 ms of right
-                self.to_will("move_right")
+                self.to_will("move", ("right"))
                 sleep(.05)
-            self.to_will("move_stop")
+            self.to_will("move", ("stop"))
+
             sleep(1)
 
 
-ego_small_researcher = EgoSmallResearcher()
+node = Node(name="EgoSmallResearcher")

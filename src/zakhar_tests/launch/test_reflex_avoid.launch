@@ -1,0 +1,6 @@
+<launch>
+
+    <include file="$(find zakhar_launch)/launch/low_level.launch" />
+    <node name="reflex_avoid_close_objects" pkg="zakhar_mind" type="reflex_avoid_close_objects.py"/>
+
+</launch>

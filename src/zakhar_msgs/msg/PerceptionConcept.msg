@@ -1,2 +1,2 @@
 string symbol
-string modificator
+string modifier

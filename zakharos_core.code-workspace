@@ -7,6 +7,7 @@
 			"ms-python.python",
 			"njpwerner.autodocstring",
 			"yzhang.markdown-all-in-one",
+			"cheshirekow.cmake-format"
 		]
 	},
 	"folders": [
@@ -31,11 +32,18 @@
 		"files.exclude": {
 			"**/*.pyc": true
 		},
+		"terminal.integrated.shell.linux": "/bin/bash",
+
+		// C/Cpp ---------------------------------------------------------------
+		"C_Cpp.default.compilerPath": "gcc",
+		"C_Cpp.loggingLevel": "Debug",
+		"C_Cpp.intelliSenseEngine": "Default",
+		// Python --------------------------------------------------------------
+		"python.pythonPath": "/usr/local/bin/python3",
 		"python.linting.pylintEnabled": false,
 		"python.linting.enabled": true,
 		"python.linting.flake8Enabled": true,
 		"python.languageServer": "Jedi",
-		// "python.analysis.logLevel": "Trace",
 		"python.formatting.blackArgs": [
 			"--line-length 119"
 		],
@@ -51,8 +59,6 @@
 			"${workspaceFolder}/src/zakhar_mind_tests/src",
 			"${workspaceFolder}/src/zakhar_interpreters/src",
 		],
-		"ros.distro": "noetic",
-		"terminal.integrated.shell.linux": "/bin/bash",
 		"python.autoComplete.extraPaths": [
 			"/opt/ros/noetic/lib/python3/dist-packages/",
 			"${workspaceFolder}/devel/lib/python3/dist-packages",
@@ -64,7 +70,54 @@
 			"${workspaceFolder}/src/zakhar_mind_tests/src",
 			"${workspaceFolder}/src/zakhar_interpreters/src",
 		],
-		"workspace.isHidden": false,
+
+
+		// ROS -----------------------------------------------------------------
+		"ros.distro": "noetic",
+		"files.associations": {
+			"*.html": "html",
+			"*.inc": "innopascal",
+			"*.log": "log",
+			"*.rst": "restructuredtext",
+			"string": "cpp",
+			"*.tcc": "cpp",
+			"cctype": "cpp",
+			"clocale": "cpp",
+			"cmath": "cpp",
+			"cstdarg": "cpp",
+			"cstdint": "cpp",
+			"cstdio": "cpp",
+			"cstring": "cpp",
+			"cwchar": "cpp",
+			"vector": "cpp",
+			"initializer_list": "cpp",
+			"iosfwd": "cpp",
+			"iostream": "cpp",
+			"istream": "cpp",
+			"limits": "cpp",
+			"ostream": "cpp",
+			"sstream": "cpp",
+			"stdexcept": "cpp",
+			"string_view": "cpp",
+			"type_traits": "cpp",
+			"typeinfo": "cpp",
+			"array": "cpp",
+			"hash_map": "cpp",
+			"deque": "cpp",
+			"forward_list": "cpp",
+			"list": "cpp",
+			"unordered_map": "cpp",
+			"valarray": "cpp",
+			"memory": "cpp",
+			"functional": "cpp",
+			"tuple": "cpp",
+			"optional": "cpp",
+			"ratio": "cpp",
+			"system_error": "cpp",
+			"utility": "cpp",
+			"variant": "cpp",
+			"chrono": "cpp"
+		},
 	},
 	"tasks": {
 		"version": "2.0.0",
@@ -77,6 +130,17 @@
 				"options": {
 					"cwd": "${workspaceFolder}",
 				},
+				"problemMatcher":"$catkin-gcc"
+			},
+			{
+				"label": "Build EmotionCore Node",
+				"type": "shell",
+				"group": "build",
+				"command": "catkin build zakhar_emotion_core",
+				"options": {
+					"cwd": "${workspaceFolder}",
+				},
+				"problemMatcher":"$catkin-gcc"
 			},
 			{
 				"label": "Clean Build",
@@ -99,14 +163,27 @@
 				},
 			},
 			{
+				"label": "Set permission",
+				"type": "shell",
+				"command": "bash ${workspaceFolder}/set_permissions.sh",
+				"options": {
+					"cwd": "${workspaceFolder}",
+				},
+			},
+			{
 				"label": "Kill all python processes",
 				"type": "shell",
 				"command": "pkill python",
 			},
 			{
-				"label": "Update zakhar-pycore",
+				"label": "Update zakhar-pycore (pypi.org)",
 				"type": "shell",
 				"command": "python3 -m pip install --no-cache-dir --force-reinstall --user zakhar_pycore",
+			},
+			{
+				"label": "Update zakhar-pycore (GitHub)",
+				"type": "shell",
+				"command": "python3 -m pip install --no-cache-dir --force-reinstall --user git+https://github.com/an-dr/zakhar_pycore",
 			},
 			{
 				"label": "Start roscore",

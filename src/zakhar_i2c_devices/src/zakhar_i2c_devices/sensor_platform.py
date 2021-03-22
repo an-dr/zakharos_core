@@ -1,7 +1,6 @@
 import rospy
-from os.path import basename, splitext
-from zakhar_pycore.constants import ADDR
 from zakhar_i2c import ZkI2cDevice
+from zakhar_pycore import dev as zdev
 from .sensor_photo_resistor import ZkSensorPhotoResistor
 from .sensor_sound_distance import ZkSensorSoundDistance
 
@@ -22,5 +21,4 @@ class I2cSensorPlatform(ZkI2cDevice):
         rospy.spin()
 
 
-DEV_NAME = splitext(basename(__file__))[0]  # filename without extension
-sensor_platform = I2cSensorPlatform(dev_name=DEV_NAME, address=ADDR.I2C.SENSORS)
+sensor_platform = I2cSensorPlatform(dev_name=zdev.sensor_platform.name, address=zdev.sensor_platform.addr)

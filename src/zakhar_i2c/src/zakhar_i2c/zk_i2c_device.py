@@ -1,10 +1,10 @@
 import threading
 import time
 import rospy
-import zakhar_common as com
+from typing import Union
+import json
+import zakhar_pycore as z
 from zakhar_msgs import srv, msg
-
-import time
 
 REG_CMD = 0
 REG_MODE = 1
@@ -44,6 +44,7 @@ class ZkI2cDevice(object):
         self.subscriber_to_cmd = None
         self.client_i2c = None
         self.client_i2c_lock = threading.Lock()
+        self.client_EmotionCoreDataDescriptor = None
         self.publisher_of_sensor_data = None
         self._started = False
         self.poll_dict = poll_dict
@@ -69,6 +70,17 @@ class ZkI2cDevice(object):
                       (self._name, to_send.sensor_type, to_send.valA, to_send.valB, to_send.valC, to_send.valD,
                        to_send.valString, to_send.message))
         self.publisher_of_sensor_data.publish(to_send)
+
+    def send_sensorDataDescriptor(self, sensor_name: str, val_max: int, val_min: int, weights_json: str):
+        m = srv.EmotionCoreDataDescriptorRequest()
+        m.sensor_name = sensor_name
+        m.val_max = val_max
+        m.val_min = val_min
+        if isinstance(weights_json, str):
+            m.weights_json = weights_json
+        else:
+            m.weights_json = weights_json.dumps()
+        return self.client_EmotionCoreDataDescriptor(m)
 
     def write(self, reg, val):
         rospy.logdebug("write(0x%x, 0x%x) to 0x%x" % (reg, val, self._address))
@@ -133,16 +145,18 @@ class ZkI2cDevice(object):
         rospy.logdebug("Node \'%s\' is starting..." % self._name)
         rospy.init_node(self._name, anonymous=False)
         ###
-        rospy.loginfo("  Waiting for the service %s", com.names.NODE_I2C_SERVER)
+        rospy.loginfo("  Waiting for the service %s", z.ros.services.I2C)
 
-        rospy.wait_for_service(com.names.NODE_I2C_SERVER)
+        rospy.wait_for_service(z.ros.services.I2C, timeout=10)
         ###
-        self.client_i2c = com.get.client(name=com.names.NODE_I2C_SERVER, service=srv.I2c)
-        self.subscriber_to_cmd = com.get.subscriber(topic_name=com.names.TOPIC_DEVICECMD,
-                                                    data_class=msg.DeviceCmd,
-                                                    callback=self.subscriber_to_cmd_callback)
-        self.publisher_of_sensor_data = com.get.publisher(topic_name=com.names.TOPIC_SENSORDATA,
-                                                          data_class=msg.SensorData)
+        self.client_i2c = z.ros.get.client(name=z.ros.services.I2C, service=srv.I2c)
+        self.client_EmotionCoreDataDescriptor = z.ros.get.client(name=z.ros.services.EMOTIONCORE_DATADSC,
+                                                                 service=srv.EmotionCoreDataDescriptor)
+        self.subscriber_to_cmd = z.ros.get.subscriber(topic_name=z.ros.topics.DEVICECMD,
+                                                      data_class=msg.DeviceCmd,
+                                                      callback=self.subscriber_to_cmd_callback)
+        self.publisher_of_sensor_data = z.ros.get.publisher(topic_name=z.ros.topics.SENSOR_DATA,
+                                                            data_class=msg.SensorData)
         self._start_poll()
         ###
         rospy.loginfo("[  DONE  ] Node \'%s\' is ready..." % self._name)

@@ -1,0 +1,3 @@
+[submodule "src/zakhar_emotion_core/libs/r_giskard_EmotionCore"]
+	path = src/zakhar_emotion_core/libs/r_giskard_EmotionCore
+	url = git@github.com:an-dr/r_giskard_EmotionCore.git

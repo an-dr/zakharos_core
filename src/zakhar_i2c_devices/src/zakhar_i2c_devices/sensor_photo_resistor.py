@@ -1,7 +1,7 @@
 import rospy
-from .sensor_abstract import ZkSensor
+from .sensor_abstract import ZkSensor, ZkSensorParamWeight
 from zakhar_pycore import helpers
-from zakhar_pycore.constants import REGS
+from zakhar_pycore import dev as zdev
 from collections import deque
 import numpy as np
 from PIL import Image
@@ -29,7 +29,17 @@ WINDOW_SIZE_ELEMENTS = int(WINDOWS_SIZE_SEC / POLL_PERIOD)
 
 class ZkSensorPhotoResistor(ZkSensor):
     def __init__(self, sensor_platform, corr_window_ms, pattern, threshold):
-        ZkSensor.__init__(self, name="photoresistor", sensor_platform=sensor_platform)
+        ZkSensor.__init__(self,
+                          name="photoresistor",
+                          sensor_platform=sensor_platform,
+                          val_min=0,
+                          val_max=0xfff,
+                          weights=[
+                              ZkSensorParamWeight("adrenaline", -0.01),
+                              ZkSensorParamWeight("dopamine", -0.1),
+                              ZkSensorParamWeight("cortisol", -0.01),
+                              ZkSensorParamWeight("melatonin", 0.5),
+                          ])
         self.mon_windows_sz_ms = corr_window_ms
         self.mon_window_sz_elements = None
         self.mon_window = None  # type: Any[deque, None]
@@ -42,8 +52,8 @@ class ZkSensorPhotoResistor(ZkSensor):
 
     def read_light(self):
         try:
-            lo = self.sensor_platform.read(REGS.SENSOR_PLATFORM.LIGHT_LO)
-            hi = self.sensor_platform.read(REGS.SENSOR_PLATFORM.LIGHT_HI)
+            lo = self.sensor_platform.read(zdev.sensor_platform.reg.LIGHT_LO)
+            hi = self.sensor_platform.read(zdev.sensor_platform.reg.LIGHT_HI)
         except rospy.ServiceException:
             return 0xffff
         if lo is None or hi is None:
