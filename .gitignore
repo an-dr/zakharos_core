@@ -15,4 +15,5 @@ src/CMakeLists.txt
 logs
 
 # ide files
-.vscode
+.vscode/**
+!.vscode/c_cpp_properties.json

@@ -2,6 +2,7 @@
 
 from zakhar_pycore.i2c import write
 from zakhar_pycore.constants import ADDR
+from zakhar_pycore.dev import moving_platform
 from zakhar_pycore.helpers.os import wait_key
 
 if __name__ == "__main__":
@@ -11,4 +12,4 @@ if __name__ == "__main__":
         if key == 0x1b:
             print("Exit")
             exit()
-        write(ADDR.I2C.MOTORS, 0, key)  # write
+        write(moving_platform.addr, 0, key)  # write
