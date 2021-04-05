@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package format="2">
+
+  <name>aliveos_middle</name>
+  <version>0.1.0</version>
+  <description>The aliveos_middle package</description>
+
+  <author email="mail@agramakov.me">Andrei Gramakov</author>
+  <maintainer email="mail@agramakov.me">Andrei Gramakov</maintainer>
+  <license>GPLv3</license>
+  <url type="website">https://github.com/an-dr/aliveos</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <build_depend>aliveos_msgs</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+
+  <exec_depend>aliveos_msgs</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+</package>

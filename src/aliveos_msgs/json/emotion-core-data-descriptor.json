@@ -1,0 +1,55 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "",
+    "description": "",
+    "type": "object",
+    "required": [
+        "value_min",
+        "value_max"
+    ],
+    "properties": {
+        "data_type":{
+            "description": "Name of the data type. E.g. 'y_value', 'temperature', etc.",
+            "type": "string",
+            "default": "value"
+        },
+        "value_min": {
+            "description": "Minimal value from the sensor",
+            "type": "number"
+        },
+        "value_max": {
+            "description": "Minimal value from the sensor",
+            "type": "number"
+        },
+        "weights": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "uniqueItems": true,
+                "required": [
+                    "parameter",
+                    "value"
+                ],
+                "properties": {
+                    "parameter": {
+                        "description": "Name of the affected parameter",
+                        "type": "string",
+                        "enum": [
+                            "adrenaline",
+                            "cortisol",
+                            "dopamine",
+                            "melatonin",
+                            "oxytocin",
+                            "serotonin"
+                        ]
+                    },
+                    "value": {
+                        "description": "Value of the weight",
+                        "type": "number"
+                    }
+                }
+            }
+        }
+    }
+}

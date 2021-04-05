@@ -5,6 +5,8 @@ SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_NAME"
 function log { echo "- $1 [$SCRIPT_NAME]" ;}
 # ----------------------------------------------------------------------------
 
+export ROSCONSOLE_FORMAT='${severity}: ${message} | ${file}:${line}'
+
 # 1. Check if sourced
 if [ -n "${BASH_SOURCE}" ] && [ "${BASH_SOURCE[0]}" = "${0}" ] ; then
     echo -e "This script should be sourced, not executed: \n. $SCRIPT_PATH"

@@ -1,0 +1,6 @@
+<launch>
+
+    <param name="emotion_core_enable" type="bool" value="true" />
+    <node name="aliveos_emotion_core" pkg="aliveos_middle" type="aliveos_emotion_core_node"/>
+
+</launch>

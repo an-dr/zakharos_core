@@ -1,0 +1,65 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "Perception Concept Descriptor Schema",
+    "description": "Describes the structure of the descriptor",
+    "type": "object",
+    "properties": {
+        "data_types": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "data_type": {
+                        "description": "Type of the data from the device. E.g. xy_angle, temperature, sensor_left",
+                        "type": "string"
+                    },
+                    "descriptor": {
+                        "description": "Description of the concept with different modifiers",
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "concept": {
+                                    "type": "string",
+                                    "description": "Name of the perception concept",
+                                    "minLength": 1
+                                },
+                                "conditions": {
+                                    "description": "Conditions on which the concept is applying. (`cold` if temperature sensor registers value < 10ºC)",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "required": [
+                                            "condition",
+                                            "threshold"
+                                        ],
+                                        "properties": {
+                                            "condition": {
+                                                "type": "string",
+                                                "description": "Command code (if supported) in hex or dec",
+                                                "enum": [
+                                                    "EQUAL",
+                                                    "NOT_EQUALS",
+                                                    "GREATER_THAN",
+                                                    "GREATER_THAN_OR_EQUAL",
+                                                    "LESS_THAN",
+                                                    "LESS_THAN_OR_EQUAL"
+                                                ]
+                                            },
+                                            "threshold": {
+                                                "type": "number",
+                                                "description": "Value with which current sensor value will be compared"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

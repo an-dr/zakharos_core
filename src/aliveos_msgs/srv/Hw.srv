@@ -1,0 +1,5 @@
+string server_cmd
+string hw_target
+string data
+---
+string response

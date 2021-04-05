@@ -1,0 +1,87 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Build",
+				"type": "shell",
+				"command": "python",
+				"args": [
+					"setup.py",
+					"sdist"
+				],
+				"options": {
+					"cwd": "${workspaceFolder}"
+				},
+				"problemMatcher": [],
+			},
+			{
+				"label": "Clean",
+				"type": "shell",
+				"command": "python",
+				"args": [
+					"setup.py",
+					"clean",
+					"--all"
+				],
+				"options": {
+					"cwd": "${workspaceFolder}"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Publish",
+				"type": "shell",
+				"command": "twine",
+				"args": [
+					"upload",
+					"dist/*"
+				],
+				"options": {
+					"cwd": "${workspaceFolder}"
+				},
+				"problemMatcher": [],
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": true,
+					"panel": "shared",
+					"showReuseMessage": true,
+					"clear": false
+				}
+			},
+			{
+				"label": "Clean > Build > Publish",
+				"type": "shell",
+				"command": "twine",
+				"args": [
+					"upload",
+					"dist/*"
+				],
+				"options": {
+					"cwd": "${workspaceFolder}"
+				},
+				"dependsOn": [
+					"Clean",
+					"Build"
+				],
+				"dependsOrder": "sequence",
+				"problemMatcher": [],
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": true,
+					"panel": "shared",
+					"showReuseMessage": true,
+					"clear": false
+				}
+			},
+		]
+	},
+	"settings": {}
+}

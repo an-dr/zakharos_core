@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>aliveos_launch</name>
+  <version>0.1.0</version>
+  <description>The aliveos_launch package</description>
+
+  <author email="mail@agramakov.me">Andrei Gramakov</author>
+  <maintainer email="mail@agramakov.me">Andrei Gramakov</maintainer>
+  <license>GPLv3</license>
+  <url type="website">https://github.com/an-dr/aliveos</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>

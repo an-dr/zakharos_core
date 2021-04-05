@@ -1,0 +1,55 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "Set of Emotion Core parameters",
+    "description": "Describes set of Animal Emotion Core parameters. Based on \"Biochemistry of Hormones that Influences Feelings\", Monica Butnariu & Ioan Sarac, 2019",
+    "type": "object",
+    "required": [
+        "adrenaline",
+        "cortisol",
+        "dopamine",
+        "melatonin",
+        "oxytocin",
+        "serotonin",
+        "value"
+    ],
+    "properties": {
+        "adrenaline":{
+            "description": "When need energy, minutes scale",
+            "minimum": 0,
+            "required": true,
+            "type": "number"
+        },
+        "cortisol":{
+            "description": "Stress",
+            "minimum": 0,
+            "required": true,
+            "type": "number"
+        },
+        "dopamine":{
+            "description": "Happiness and curiosity",
+            "minimum": 0,
+            "required": true,
+            "type": "number"
+        },
+        "melatonin":{
+            "description": "When don't need energy, daily scale (opposite side: depression)",
+            "minimum": 0,
+            "required": true,
+            "type": "number"
+        },
+        "oxytocin":{
+            "description": "Calm and trust (opposite side: anxiety)",
+            "minimum": 0,
+            "required": true,
+            "type": "number"
+        },
+        "serotonin":{
+            "description": "Being kind (opposite side: anger, violence)",
+            "minimum": 0,
+            "required": true,
+            "type": "number"
+        }
+
+    }
+}
