@@ -1,0 +1,6 @@
+<launch>
+
+    <node name="concept2commands_interpreter" pkg="aliveos_middle" type="concept2commands_interpreter.py"/>
+    <node name="data2concept_interpreter" pkg="aliveos_middle" type="data2concept_interpreter.py"/>
+
+</launch>

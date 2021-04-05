@@ -1,0 +1,40 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "Set of Emotion Core parameters",
+    "description": "Describes set of Emotion Core weights for the Animal Emotion Core that can be reported by sensors during their initialization. Based on \"Biochemistry of Hormones that Influences Feelings\", Monica Butnariu & Ioan Sarac, 2019",
+    "type": "object",
+    "properties": {
+        "weights": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "uniqueItems": true,
+                "required": [
+                    "parameter",
+                    "value"
+                ],
+                "properties": {
+                    "parameter": {
+                        "description": "Name of the affected parameter",
+                        "type": "string",
+                        "required": true,
+                        "enum": [
+                            "adrenaline",
+                            "cortisol",
+                            "dopamine",
+                            "melatonin",
+                            "oxytocin",
+                            "serotonin"
+                        ]
+                    },
+                    "value": {
+                        "description": "Value of the weight",
+                        "type": "number",
+                        "required": true
+                    }
+                }
+            }
+        }
+    }
+}

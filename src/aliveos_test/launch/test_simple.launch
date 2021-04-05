@@ -1,0 +1,16 @@
+<launch>
+
+    <param name="emotion_core_enable" type="bool" value="true" />
+    <node name="aliveos_emotion_core" pkg="aliveos_middle" type="aliveos_emotion_core_node"/>
+    
+    <node name="concept2commands_interpreter" pkg="aliveos_middle" type="concept2commands_interpreter.py"/>
+    <node name="data2concept_interpreter" pkg="aliveos_middle" type="data2concept_interpreter.py"/>
+
+
+
+    <node name="simple_device" pkg="aliveos_test" type="simple_device.py"/>
+    <node name="simple_ego" pkg="aliveos_test" type="simple_ego.py"/>
+    <node name="simple_instinct" pkg="aliveos_test" type="simple_instinct.py"/>
+    <node name="simple_reflex" pkg="aliveos_test" type="simple_reflex.py"/>
+
+</launch>

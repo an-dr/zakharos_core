@@ -1,0 +1,22 @@
+{
+    "$schema": "/home/agramakov/Files/Code/zakharos_core/src/aliveos_msgs/json/command-concept-dsc.json",
+    "name": "simple_reflex_conept",
+    "descriptor": [
+        {
+            "modifier": "",
+            "commands": [
+                {
+                    "device_name": "simple_device",
+                    "command": "move",
+                    "arguments": [
+                        "forward",
+                        "100ms"
+                    ]
+                },
+                {
+                    "device_name": "simple_device",
+                    "command": "stop"
+                }
+            ]
+        }    ]
+}

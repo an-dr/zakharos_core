@@ -1,0 +1,60 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/product.schema.json",
+    "title": "Command Concept Descriptor Schema",
+    "description": "Describes the structure of the descriptor",
+    "type": "object",
+    "required": [
+        "name",
+        "descriptor"
+    ],
+    "properties": {
+        "name": {
+            "description": "Name of the concept",
+            "type": "string"
+        },
+        "descriptor": {
+            "description": "Description of the concept with different modifiers",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "modifier": {
+                        "type": "string",
+                        "description": "Modifier of the descriptor. Can be empty, must be unique",
+                        "default": ""
+                    },
+                    "commands": {
+                        "description": "Sequence of commands to the hardware",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "device_name",
+                                "command"
+                            ],
+                            "properties": {
+                                "device_name":{
+                                    "type": "string",
+                                    "description": "Name of a device"
+                                },
+                                "command": {
+                                    "type": "string",
+                                    "description": "Command. Should be supported be the device."
+                                },
+                                "arguments": {
+                                    "type": "array",
+                                    "description": "Optional arguments of the command.",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

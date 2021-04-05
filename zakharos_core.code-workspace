@@ -1,196 +1,256 @@
 {
-	"extensions": {
-		"recommendations": [
-			"actboy168.tasks",
-			"gruntfuggly.todo-tree",
-			"ms-iot.vscode-ros",
-			"ms-python.python",
-			"njpwerner.autodocstring",
-			"yzhang.markdown-all-in-one",
-			"cheshirekow.cmake-format"
-		]
-	},
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"launch": {
-		"configurations": [
-			{
-				"name": "Python: Current File",
-				"type": "python",
-				"request": "launch",
-				"program": "${file}",
-				"console": "integratedTerminal",
-			},
-		],
-		"compounds": []
-	},
-	"settings": {
-		"debug.allowBreakpointsEverywhere": true,
-		"files.exclude": {
-			"**/*.pyc": true
-		},
-		"terminal.integrated.shell.linux": "/bin/bash",
-
-		// C/Cpp ---------------------------------------------------------------
-		"C_Cpp.default.compilerPath": "gcc",
-		"C_Cpp.loggingLevel": "Debug",
-		"C_Cpp.intelliSenseEngine": "Default",
-		// Python --------------------------------------------------------------
-		"python.pythonPath": "/usr/local/bin/python3",
-		"python.linting.pylintEnabled": false,
-		"python.linting.enabled": true,
-		"python.linting.flake8Enabled": true,
-		"python.languageServer": "Jedi",
-		"python.formatting.blackArgs": [
-			"--line-length 119"
-		],
-		"python.linting.banditEnabled": true,
-		"python.analysis.extraPaths": [
-			"/opt/ros/noetic/lib/python3/dist-packages/",
-			"${workspaceFolder}/devel/lib/python3/dist-packages",
-			"${workspaceFolder}/src/zakhar_common/src",
-			"${workspaceFolder}/src/zakhar_i2c/src",
-			"${workspaceFolder}/src/zakhar_i2c_devices/src",
-			"${workspaceFolder}/src/zakhar_log/src",
-			"${workspaceFolder}/src/zakhar_mind/src",
-			"${workspaceFolder}/src/zakhar_mind_tests/src",
-			"${workspaceFolder}/src/zakhar_interpreters/src",
-		],
-		"python.autoComplete.extraPaths": [
-			"/opt/ros/noetic/lib/python3/dist-packages/",
-			"${workspaceFolder}/devel/lib/python3/dist-packages",
-			"${workspaceFolder}/src/zakhar_common/src",
-			"${workspaceFolder}/src/zakhar_i2c/src",
-			"${workspaceFolder}/src/zakhar_i2c_devices/src",
-			"${workspaceFolder}/src/zakhar_log/src",
-			"${workspaceFolder}/src/zakhar_mind/src",
-			"${workspaceFolder}/src/zakhar_mind_tests/src",
-			"${workspaceFolder}/src/zakhar_interpreters/src",
-		],
-
-
-		// ROS -----------------------------------------------------------------
-		"ros.distro": "noetic",
-		"files.associations": {
-			"*.html": "html",
-			"*.inc": "innopascal",
-			"*.log": "log",
-			"*.rst": "restructuredtext",
-			"string": "cpp",
-			"*.tcc": "cpp",
-			"cctype": "cpp",
-			"clocale": "cpp",
-			"cmath": "cpp",
-			"cstdarg": "cpp",
-			"cstdint": "cpp",
-			"cstdio": "cpp",
-			"cstring": "cpp",
-			"cwchar": "cpp",
-			"vector": "cpp",
-			"initializer_list": "cpp",
-			"iosfwd": "cpp",
-			"iostream": "cpp",
-			"istream": "cpp",
-			"limits": "cpp",
-			"ostream": "cpp",
-			"sstream": "cpp",
-			"stdexcept": "cpp",
-			"string_view": "cpp",
-			"type_traits": "cpp",
-			"typeinfo": "cpp",
-			"array": "cpp",
-			"hash_map": "cpp",
-			"deque": "cpp",
-			"forward_list": "cpp",
-			"list": "cpp",
-			"unordered_map": "cpp",
-			"valarray": "cpp",
-			"memory": "cpp",
-			"functional": "cpp",
-			"tuple": "cpp",
-			"optional": "cpp",
-			"ratio": "cpp",
-			"system_error": "cpp",
-			"utility": "cpp",
-			"variant": "cpp",
-			"chrono": "cpp"
-		},
-	},
-	"tasks": {
-		"version": "2.0.0",
-		"tasks": [
-			{
-				"label": "Build",
-				"type": "shell",
-				"group": "build",
-				"command": "bash ${workspaceFolder}/build.sh",
-				"options": {
-					"cwd": "${workspaceFolder}",
-				},
-				"problemMatcher":"$catkin-gcc"
-			},
-			{
-				"label": "Build EmotionCore Node",
-				"type": "shell",
-				"group": "build",
-				"command": "catkin build zakhar_emotion_core",
-				"options": {
-					"cwd": "${workspaceFolder}",
-				},
-				"problemMatcher":"$catkin-gcc"
-			},
-			{
-				"label": "Clean Build",
-				"type": "shell",
-				"group": "build",
-				"command": "bash ${workspaceFolder}/build.sh",
-				"dependsOn": [
-					"Clean"
-				],
-				"options": {
-					"cwd": "${workspaceFolder}",
-				},
-			},
-			{
-				"label": "Clean",
-				"type": "shell",
-				"command": "catkin clean --yes",
-				"options": {
-					"cwd": "${workspaceFolder}",
-				},
-			},
-			{
-				"label": "Set permission",
-				"type": "shell",
-				"command": "bash ${workspaceFolder}/set_permissions.sh",
-				"options": {
-					"cwd": "${workspaceFolder}",
-				},
-			},
-			{
-				"label": "Kill all python processes",
-				"type": "shell",
-				"command": "pkill python",
-			},
-			{
-				"label": "Update zakhar-pycore (pypi.org)",
-				"type": "shell",
-				"command": "python3 -m pip install --no-cache-dir --force-reinstall --user zakhar_pycore",
-			},
-			{
-				"label": "Update zakhar-pycore (GitHub)",
-				"type": "shell",
-				"command": "python3 -m pip install --no-cache-dir --force-reinstall --user git+https://github.com/an-dr/zakhar_pycore",
-			},
-			{
-				"label": "Start roscore",
-				"type": "shell",
-				"isBackground": true,
-				"command": "roscore",
-			},
-		]
-	}
+    "extensions": {
+        "recommendations": [
+            "actboy168.tasks",
+            "gruntfuggly.todo-tree",
+            "ms-iot.vscode-ros",
+            "ms-python.python",
+            "njpwerner.autodocstring",
+            "yzhang.markdown-all-in-one",
+            "cheshirekow.cmake-format"
+        ]
+    },
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "launch": {
+        "configurations": [
+            {
+                "name": "Python: Current File",
+                "type": "python",
+                "request": "launch",
+                "program": "${file}",
+                "console": "integratedTerminal",
+            },
+        ],
+        "compounds": []
+    },
+    "settings": {
+        "debug.allowBreakpointsEverywhere": true,
+        "files.exclude": {
+            "**/*.pyc": true
+        },
+        "terminal.integrated.shell.linux": "/bin/bash",
+        // C/Cpp ---------------------------------------------------------------
+        "C_Cpp.default.compilerPath": "gcc",
+        "C_Cpp.loggingLevel": "Debug",
+        "C_Cpp.intelliSenseEngine": "Default",
+        // Python --------------------------------------------------------------
+        "python.pythonPath": "/usr/bin/python",
+        "python.linting.pylintEnabled": false,
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.languageServer": "Jedi",
+        "python.formatting.blackArgs": [
+            "--line-length 119"
+        ],
+        "python.linting.banditEnabled": true,
+        "python.analysis.extraPaths": [
+            "/opt/ros/noetic/lib/python3/dist-packages/",
+            "${workspaceFolder}/devel/lib/python3/dist-packages",
+            "${workspaceFolder}/src/zakhar_common/src",
+            "${workspaceFolder}/src/zakhar_i2c/src",
+            "${workspaceFolder}/src/zakhar_i2c_devices/src",
+            "${workspaceFolder}/src/zakhar_log/src",
+            "${workspaceFolder}/src/zakhar_mind/src",
+            "${workspaceFolder}/src/zakhar_mind_tests/src",
+            "${workspaceFolder}/src/aliveos/src",
+            "${workspaceFolder}/src/aliveos_app/src",
+            "${workspaceFolder}/src/aliveos_hw_level/src",
+            "${workspaceFolder}/src/aliveos_hw/src",
+            "${workspaceFolder}/src/aliveos_middle/py",
+            "${workspaceFolder}/src/aliveos_py/src",
+        ],
+        "python.autoComplete.extraPaths": [
+            "/opt/ros/noetic/lib/python3/dist-packages/",
+            "${workspaceFolder}/devel/lib/python3/dist-packages",
+            "${workspaceFolder}/src/zakhar_common/src",
+            "${workspaceFolder}/src/zakhar_i2c/src",
+            "${workspaceFolder}/src/zakhar_i2c_devices/src",
+            "${workspaceFolder}/src/zakhar_log/src",
+            "${workspaceFolder}/src/zakhar_mind/src",
+            "${workspaceFolder}/src/zakhar_mind_tests/src",
+            "${workspaceFolder}/src/aliveos/src",
+            "${workspaceFolder}/src/aliveos_app/src",
+            "${workspaceFolder}/src/aliveos_hw_level/src",
+            "${workspaceFolder}/src/aliveos_hw/src",
+            "${workspaceFolder}/src/aliveos_middle/py",
+            "${workspaceFolder}/src/aliveos_py/src",
+        ],
+        // ROS -----------------------------------------------------------------
+        "ros.distro": "noetic",
+        "files.associations": {
+            "*.html": "html",
+            "*.inc": "innopascal",
+            "*.log": "log",
+            "*.rst": "restructuredtext",
+            "string": "cpp",
+            "*.tcc": "cpp",
+            "cctype": "cpp",
+            "clocale": "cpp",
+            "cmath": "cpp",
+            "cstdarg": "cpp",
+            "cstdint": "cpp",
+            "cstdio": "cpp",
+            "cstring": "cpp",
+            "cwchar": "cpp",
+            "vector": "cpp",
+            "initializer_list": "cpp",
+            "iosfwd": "cpp",
+            "iostream": "cpp",
+            "istream": "cpp",
+            "limits": "cpp",
+            "ostream": "cpp",
+            "sstream": "cpp",
+            "stdexcept": "cpp",
+            "string_view": "cpp",
+            "type_traits": "cpp",
+            "typeinfo": "cpp",
+            "array": "cpp",
+            "hash_map": "cpp",
+            "deque": "cpp",
+            "forward_list": "cpp",
+            "list": "cpp",
+            "unordered_map": "cpp",
+            "valarray": "cpp",
+            "memory": "cpp",
+            "functional": "cpp",
+            "tuple": "cpp",
+            "optional": "cpp",
+            "ratio": "cpp",
+            "system_error": "cpp",
+            "utility": "cpp",
+            "variant": "cpp",
+            "chrono": "cpp",
+            "unordered_set": "cpp",
+            "hash_set": "cpp",
+            "ranges": "cpp",
+            "bitset": "cpp",
+            "cstddef": "cpp",
+            "cstdlib": "cpp",
+            "ctime": "cpp",
+            "cwctype": "cpp",
+            "atomic": "cpp",
+            "strstream": "cpp",
+            "bit": "cpp",
+            "compare": "cpp",
+            "complex": "cpp",
+            "concepts": "cpp",
+            "condition_variable": "cpp",
+            "map": "cpp",
+            "set": "cpp",
+            "exception": "cpp",
+            "algorithm": "cpp",
+            "iterator": "cpp",
+            "memory_resource": "cpp",
+            "numeric": "cpp",
+            "random": "cpp",
+            "fstream": "cpp",
+            "iomanip": "cpp",
+            "mutex": "cpp",
+            "new": "cpp",
+            "shared_mutex": "cpp",
+            "stop_token": "cpp",
+            "streambuf": "cpp",
+            "thread": "cpp",
+            "cfenv": "cpp",
+            "cinttypes": "cpp",
+            "typeindex": "cpp"
+        },
+        "autoDocstring.docstringFormat": "numpy",
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "Build",
+                "type": "shell",
+                "group": "build",
+                "command": "bash ${workspaceFolder}/build.sh",
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                },
+                "problemMatcher": "$catkin-gcc"
+            },
+            {
+                "label": "Build EmotionCore Node",
+                "type": "shell",
+                "group": "build",
+                "command": "catkin build aliveos_emotion_core",
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                },
+                "problemMatcher": "$catkin-gcc"
+            },
+            {
+                "label": "Launch rqt_console",
+                "type": "shell",
+                "group": "build",
+                "command": "rqt_console",
+                "presentation": {
+                    "echo": false,
+                    "reveal": "silent",
+                    "focus": false,
+                    "panel": "shared",
+                    "showReuseMessage": false,
+                    "clear": false
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                },
+                "problemMatcher": "$catkin-gcc"
+            },
+            {
+                "label": "Clean Build",
+                "type": "shell",
+                "group": "build",
+                "command": "bash ${workspaceFolder}/build.sh",
+                "dependsOn": [
+                    "Clean"
+                ],
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                },
+            },
+            {
+                "label": "Clean",
+                "type": "shell",
+                "command": "catkin clean --yes",
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                },
+            },
+            {
+                "label": "Set permission",
+                "type": "shell",
+                "command": "bash ${workspaceFolder}/set_permissions.sh",
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                },
+            },
+            {
+                "label": "Kill all python processes",
+                "type": "shell",
+                "command": "pkill python",
+            },
+            {
+                "label": "Update zakhar-pycore (pypi.org)",
+                "type": "shell",
+                "command": "python3 -m pip install --no-cache-dir --force-reinstall --user zakhar_pycore",
+            },
+            {
+                "label": "Update zakhar-pycore (GitHub)",
+                "type": "shell",
+                "command": "python3 -m pip install --no-cache-dir --force-reinstall --user git+https://github.com/an-dr/zakhar_pycore",
+            },
+            {
+                "label": "Start roscore",
+                "type": "shell",
+                "isBackground": true,
+                "command": "roscore",
+            },
+        ]
+    }
 }

@@ -1,0 +1,6 @@
+<launch>
+
+    <include file="$(dirname)/_interpreters.launch" />
+    <include file="$(dirname)/_emotion_core.launch" />
+
+</launch>

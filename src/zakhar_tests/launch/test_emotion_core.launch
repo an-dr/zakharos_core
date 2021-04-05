@@ -2,7 +2,7 @@
 
     <!-- <include file="$(find zakhar_launch)/launch/low_level.launch" /> -->
     <node name="zakhar_emotion_core" pkg="zakhar_emotion_core" type="zakhar_emotion_core_node"/>
-    <node name="data2concept_interpreter" pkg="zakhar_interpreters" type="data2concept_interpreter.py"/>
+    <node name="data2concept_interpreter" pkg="aliveos_interpreters" type="data2concept_interpreter.py"/>
     <!-- <node name="test_SomeSensor" pkg="zakhar_tests" type="sensor_mock.py"/> -->
     <!-- <node name="ego_emotion_reader" pkg="zakhar_tests" type="ego_emotion_reader.py"/> -->
 
