@@ -33,11 +33,12 @@ class SimpleDevice(AbstractDevice):
             sleep(1)
 
 
-d = SimpleDevice(dev_name="simple_device",
-                 hw_server_name="simple_hw_server",
-                 perception_concept_descriptor_json=f"{os.path.dirname(__file__)}/" +
-                 "simple_device _pc_dsc.json",
-                 emotion_core_data_descriptor_json="""
+d = SimpleDevice(
+    dev_name="simple_device",
+    #  hw_server_name="simple_hw_server",
+    hw_server_name=None,
+    perception_concept_descriptor_json=f"{os.path.dirname(__file__)}/" + "simple_device _pc_dsc.json",
+    emotion_core_data_descriptor_json="""
 {
     "$schema": "perception-concept-descriptor.json",
     "data_type": "value",
@@ -49,4 +50,4 @@ d = SimpleDevice(dev_name="simple_device",
     ]
 }
     """)
-d.start(wait_hw_srv_sec=-1, wait_perception_dsc_srv_sec=30, wait_ecore_data_dsc_srv_sec=30)
+d.start()

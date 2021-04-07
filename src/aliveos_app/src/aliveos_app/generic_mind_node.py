@@ -20,13 +20,16 @@
 #
 # *************************************************************************
 
-import rospy
 import json
+
+from rosparam import get_param
+from rospkg import RosPack, ResourceNotFound
+from rospy import logdebug, logerr, loginfo, init_node
+from rospy.service import ServiceException
+
 from aliveos_msgs import srv, msg
 from aliveos_py import ros as ar
 from aliveos_py.helpers.json_tools import json_to_dict, dict_to_json_str, ValidationError
-from rospy.service import ServiceException
-from rospkg import RosPack, ResourceNotFound
 from . import node_types
 
 
@@ -61,20 +64,21 @@ class GenericMindNode:
         params_dict = json.loads(params.params_json)
         self.current_emotion_params = params_dict
 
-    def _start_communications(self):
-        rospy.logdebug("Client \'%s\' is starting..." % self.name)
-        self.subscriber_perception_concept = ar.get.subscriber(topic_name=ar.topics.MAIN_SENSOR_INTERPRETER,
+    def _init_communications(self):
+        logdebug("Client \'%s\' is starting..." % self.name)
+        self.subscriber_perception_concept = ar.get.subscriber(topic_name=get_param("TOPIC_PC"),
                                                                data_class=msg.PerceptionConcept,
                                                                callback=self._perception_callback)
-        self.subscriber_emotion_params = ar.get.subscriber(topic_name=ar.topics.EMOTION_PARAMS,
+        self.subscriber_emotion_params = ar.get.subscriber(topic_name=get_param("TOPIC_EPARAM"),
                                                            data_class=msg.EmotionParams,
                                                            callback=self._emotion_callback)
-        self.client_command_concept = rospy.ServiceProxy(ar.services.CONCEPT_TO_COMMAND, srv.CommandConcept)
-        self.client_of_emotion_core_write = ar.get.client(srv_name=ar.services.EMOTIONCORE_WRITE,
-                                                          service=srv.EmotionCoreWrite)
-        self.client_command_concept_dsc = ar.get.client(srv_name=ar.services.C2C_COMMAND_CONCEPT_DSC,
+        self.client_command_concept = ar.get.client(srv_name=get_param("SRV_C2C_CMDC"),
+                                                    service=srv.CommandConcept)
+        self.client_command_concept_dsc = ar.get.client(srv_name=get_param("SRV_C2C_CMDDSC"),
                                                         service=srv.CommandConceptDescriptor)
-        rospy.loginfo("Client \'%s\' is ready" % self.name)
+        self.client_of_emotion_core_write = ar.get.client(srv_name=get_param("SRV_ECORE_W"),
+                                                          service=srv.EmotionCoreWrite)
+        loginfo("Client \'%s\' is ready" % self.name)
 
     def _send_command_concept_single(self, cc):
         json_dict = json_to_dict(in_json=cc, in_schema=f"{self.schema_path}/command-concept-dsc.json")
@@ -88,14 +92,12 @@ class GenericMindNode:
             try:
                 self._send_command_concept_single(cc)
             except ValidationError as e:
-                rospy.logerr(f"Incorrect input json: {cc}\nError:[{e.message}]")
+                logerr(f"Incorrect input json: {cc}\nError:[{e.message}]")
 
     def start(self):
-        rospy.logdebug("Node \'%s\' is starting..." % self.name)
-        rospy.init_node(self.name, anonymous=False)
-        self._start_communications()
+        init_node(self.name, anonymous=False)
+        self._init_communications()
         self._send_command_concepts()
-        rospy.loginfo("[  DONE  ] Node \'%s\' is ready..." % self.name)
 
     def write_to_emotion_core(self, value: int, change_per_sec: int,
                               param: str) -> srv.EmotionCoreWriteResponse:
@@ -106,7 +108,7 @@ class GenericMindNode:
         try:
             r = self.client_of_emotion_core_write(m)
         except ServiceException:
-            rospy.logerr("Service PerceptionConceptDescriptor error!")
+            logerr("Service PerceptionConceptDescriptor error!")
             r = None
         return r
 

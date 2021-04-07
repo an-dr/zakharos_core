@@ -1,0 +1,8 @@
+<launch>
+
+    <param name="TOPIC_PC" type="string" value="PerceptionConcept" />
+    <param name="TOPIC_DEV_CMD" type="string" value="DeviceCommand" />
+    <param name="TOPIC_EPARAM" type="string" value="EmotionParams" />
+    <param name="TOPIC_DEV_DATA" type="string" value="DeviceData" />
+
+</launch>

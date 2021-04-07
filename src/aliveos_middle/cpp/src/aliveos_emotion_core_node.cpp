@@ -21,6 +21,7 @@
 // *************************************************************************
 
 #include <chrono>
+#include <string>
 #include "aliveos_emotion_core_node.hpp"
 #include "aliveos_msgs/EmotionCoreDataDescriptor.h"
 #include "aliveos_msgs/EmotionCoreWrite.h"
@@ -45,9 +46,18 @@ static long millis() {
 
 ZakharEmotionCoreNode::ZakharEmotionCoreNode() : loop_rate(1) {
     core                             = new AnimalEmotionCore();
-    emotion_core_write_srv           = n.advertiseService("EmotionCoreWrite", handler_EmotionCoreWrite_handler);
-    emotion_core_data_descriptor_srv = n.advertiseService("EmotionCoreDataDescriptor", handler_EmotionCoreDataDescriptor);
-    emotion_core_emotion_params_pub  = n.advertise<aliveos_msgs::EmotionParams>("/EmotionParams", 10);
+
+    string write_srv_name;
+    string data_descriptor_srv_name;
+    string eparams_topic_name;
+
+    ros::param::get("SRV_ECORE_W", write_srv_name);
+    ros::param::get("SRV_ECORE_DDSC", data_descriptor_srv_name);
+    ros::param::get("TOPIC_EPARAM", eparams_topic_name);
+
+    emotion_core_write_srv           = n.advertiseService(write_srv_name, handler_EmotionCoreWrite_handler);
+    emotion_core_data_descriptor_srv = n.advertiseService(data_descriptor_srv_name, handler_EmotionCoreDataDescriptor);
+    emotion_core_emotion_params_pub  = n.advertise<aliveos_msgs::EmotionParams>(eparams_topic_name, 10);
 }
 
 ZakharEmotionCoreNode *ZakharEmotionCoreNode::GetInstance() {

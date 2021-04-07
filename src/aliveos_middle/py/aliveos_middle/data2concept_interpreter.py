@@ -20,8 +20,9 @@
 #
 # *************************************************************************
 
-import rospy
-from os.path import basename, splitext
+from rosparam import get_param
+from rospy import logdebug, logwarn, init_node, ServiceException, spin
+
 from aliveos_msgs import msg, srv
 from aliveos_py import ros as ar
 from aliveos_py.helpers.json_tools import json_to_dict
@@ -29,7 +30,6 @@ from aliveos_py.helpers.json_tools import json_to_dict
 
 class Data2ConceptInterpreter:
     def __init__(self):
-        self.name = splitext(basename(__file__))[0]
         self.current_emotion_params = None
         self.current_device_data = {}
         self.perception_concepts = {}
@@ -49,7 +49,7 @@ class Data2ConceptInterpreter:
         to_send.symbol = symbol
         to_send.modifier = modifier
         self.publisher_to_egos.publish(to_send)
-        rospy.logdebug("Sent [%s, %s]" % (symbol, modifier))
+        logdebug("Sent [%s, %s]" % (symbol, modifier))
 
     def _check_condition(self, device_data_name: str, condition: str, threshold: float) -> bool:
         device_data_val = self.current_device_data.get(device_data_name)
@@ -72,7 +72,7 @@ class Data2ConceptInterpreter:
 
     def device_data_handler(self, data: msg.DeviceData):
         dev_name = f"{data.data_source}:{data.data_type}"
-        rospy.logdebug(f"Received from {dev_name} - {data.data_value}")
+        logdebug(f"Received from {dev_name} - {data.data_value}")
         # Emotion Core
         m = srv.EmotionCoreWriteRequest()
         m.sensor_name = dev_name
@@ -80,9 +80,8 @@ class Data2ConceptInterpreter:
         self.current_device_data[f"{data.data_source}:{data.data_type}"] = data.data_value
         try:
             self.client_of_emotion_core_write(m)
-        except rospy.ServiceException:
-            rospy.logwarn("Service %s did not process request. Is it running?" %
-                          ar.services.EMOTIONCORE_WRITE)
+        except ServiceException:
+            logwarn("Service %s did not process request. Is it running?" % ar.services.EMOTIONCORE_WRITE)
 
         # Data analysis
         dev = self.perception_concepts.get(dev_name)
@@ -97,7 +96,7 @@ class Data2ConceptInterpreter:
                 if not r:
                     break
             if r:
-                rospy.logdebug("Concept is: %s" % concept)
+                logdebug("Concept is: %s" % concept)
                 self.publish_perception_concept_to_egos(symbol=concept, modifier="")
 
     def handler_perception_concetps_dsc(self, req: srv.PerceptionConceptDescriptorRequest) -> \
@@ -111,30 +110,29 @@ class Data2ConceptInterpreter:
     def handler_emotion_params(self, data: msg.EmotionParams) -> None:
         self.current_emotion_params = json_to_dict(data.params_json)
 
-    def start(self):
-        rospy.logdebug("Node \'%s\' is starting..." % self.name)
-        rospy.init_node(self.name, anonymous=False)
-
-        self.publisher_to_egos = ar.get.publisher(topic_name=ar.topics.MAIN_SENSOR_INTERPRETER,
+    def init_communications(self):
+        self.publisher_to_egos = ar.get.publisher(topic_name=get_param("TOPIC_PC"),
                                                   data_class=msg.PerceptionConcept)
-        self.subscriber_to_devices = ar.get.subscriber(topic_name=ar.topics.SENSOR_DATA,
+        self.subscriber_to_devices = ar.get.subscriber(topic_name=get_param("TOPIC_DEV_DATA"),
                                                        data_class=msg.DeviceData,
                                                        callback=self.device_data_handler)
-        self.subscriber_to_emotion_params = ar.get.subscriber(topic_name=ar.topics.EMOTION_PARAMS,
+        self.subscriber_to_emotion_params = ar.get.subscriber(topic_name=get_param("TOPIC_EPARAM"),
                                                               data_class=msg.EmotionParams,
                                                               callback=self.handler_emotion_params)
-        self.client_of_emotion_core_write = ar.get.client(srv_name=ar.services.EMOTIONCORE_WRITE,
+        self.client_of_emotion_core_write = ar.get.client(srv_name=get_param("SRV_ECORE_W"),
                                                           service=srv.EmotionCoreWrite)
-        self.client_of_emotion_data_descriptor = ar.get.client(srv_name=ar.services.EMOTIONCORE_DATADSC,
+        self.client_of_emotion_data_descriptor = ar.get.client(srv_name=get_param("SRV_ECORE_DDSC"),
                                                                service=srv.EmotionCoreDataDescriptor)
-        self.server_of_perception_concept_dsc = ar.get.server(name=ar.services.D2C_PERCEPTION_DSC,
+        self.server_of_perception_concept_dsc = ar.get.server(name=get_param("SRV_D2C_PCDSC"),
                                                               service=srv.PerceptionConceptDescriptor,
                                                               handle=self.handler_perception_concetps_dsc)
 
-        rospy.loginfo("[  DONE  ] Node \'%s\' is ready..." % self.name)
+    def start(self):
+        init_node(name=self.__class__.__name__, anonymous=False)
+        self.init_communications()
 
 
 def start():
     obj = Data2ConceptInterpreter()
     obj.start()
-    rospy.spin()
+    spin()
