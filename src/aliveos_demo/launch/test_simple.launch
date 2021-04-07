@@ -8,9 +8,9 @@
 
 
 
-    <node name="simple_device" pkg="aliveos_test" type="simple_device.py"/>
-    <node name="simple_ego" pkg="aliveos_test" type="simple_ego.py"/>
-    <node name="simple_instinct" pkg="aliveos_test" type="simple_instinct.py"/>
-    <node name="simple_reflex" pkg="aliveos_test" type="simple_reflex.py"/>
+    <node name="simple_device" pkg="aliveos_demo" type="simple_device.py"/>
+    <node name="simple_ego" pkg="aliveos_demo" type="simple_ego.py"/>
+    <node name="simple_instinct" pkg="aliveos_demo" type="simple_instinct.py"/>
+    <node name="simple_reflex" pkg="aliveos_demo" type="simple_reflex.py"/>
 
 </launch>

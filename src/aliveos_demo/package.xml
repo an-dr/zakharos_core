@@ -1,15 +1,14 @@
 <?xml version="1.0"?>
 <package format="2">
 
-  <name>aliveos_test</name>
+  <name>aliveos_demo</name>
   <version>0.1.0</version>
-  <description>The aliveos_test package</description>
+  <description>The aliveos_demo package</description>
 
   <author email="mail@agramakov.me">Andrei Gramakov</author>
   <maintainer email="mail@agramakov.me">Andrei Gramakov</maintainer>
   <license>GPLv3</license>
   <url type="website">https://github.com/an-dr/aliveos</url>
-
 
   <build_depend>message_generation</build_depend>
   <exec_depend>message_runtime</exec_depend>
