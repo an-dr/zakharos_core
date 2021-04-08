@@ -1,0 +1,9 @@
+<launch>
+
+    <param name="SRV_C2C_CMDC" type="string" value="C2C_CmdConcept" />
+    <param name="SRV_C2C_CMDDSC" type="string" value="C2C_CmdConceptDescriptor" />
+    <param name="SRV_D2C_PCDSC" type="string" value="D2C_PerceptionConceptDataDsc" />
+    <param name="SRV_ECORE_DDSC" type="string" value="ECore_DataDescriptor" />
+    <param name="SRV_ECORE_W" type="string" value="ECoreWrite" />
+
+</launch>

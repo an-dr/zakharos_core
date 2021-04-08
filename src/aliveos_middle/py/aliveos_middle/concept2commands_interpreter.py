@@ -20,16 +20,16 @@
 #
 # *************************************************************************
 
-import rospy
+from typing import Union
+from threading import Lock
+
+from rospy import logdebug, logerr, loginfo, logwarn, init_node, Service, spin
+from rosparam import get_param
+
 from aliveos_py import ros as ar
 from aliveos_msgs import msg, srv
-from os.path import splitext, basename
-from typing import Union, List
 from aliveos_app import node_types
-from .command_concept_abstract import CommandConceptAbstract
 from aliveos_py.helpers.json_tools import json_to_dict
-from threading import Lock
-# from uuid import uuid1
 
 
 class Concept2CommandsInterpreter:
@@ -43,8 +43,7 @@ class Concept2CommandsInterpreter:
     CODE_BUSY = 1
     CODE_ABORT = 2
 
-    def __init__(self, name="Concept2CommandsInterpreter"):
-        self.name = name
+    def __init__(self):
         self.lock_consciousness = Lock()
         self.lock_consciousness_pause = Lock()
         self.lock_consciousness_abort = Lock()
@@ -54,8 +53,8 @@ class Concept2CommandsInterpreter:
         self.concepts = {}
 
         # Servers
-        self.server_of_command_concepts = None  # type: Union[rospy.Service, None]
-        self.server_of_command_concept_descriptors = None  # type: Union[rospy.Service, None]
+        self.server_of_command_concepts = None  # type: Union[Service, None]
+        self.server_of_command_concept_descriptors = None  # type: Union[Service, None]
         # Publishers
         self.publisher_to_devices = None
 
@@ -68,25 +67,13 @@ class Concept2CommandsInterpreter:
         to_send.cmd = cmd
         to_send.arg = arg
         self.publisher_to_devices.publish(to_send)
-        rospy.logdebug(f"Send to {device}: {cmd}({arg})")
-
-    def add_concept(self, cc: CommandConceptAbstract):
-        # type check
-        if not isinstance(cc, type) and cc.__name__ == CommandConceptAbstract.__name__:
-            raise TypeError("Type of cc is %s" % str(type(cc)))
-
-        # check uniqueness
-        for i in self.concepts:
-            if i.name == cc.name:
-                raise ValueError("A concept with the same name is already present")
-
-        self.concepts.append(cc)
+        logdebug(f"Send to {device}: {cmd}({arg})")
 
     def get_concept(self, concept: str) -> Union[list, None]:
         c = self.concepts.get(concept)
         if c:
             return c
-        rospy.logerr(f"Unknown concept: {concept}")
+        logerr(f"Unknown concept: {concept}")
         return None
 
     def exec_concept(self, concept_dsc: list, modifier: str) -> str:
@@ -99,7 +86,7 @@ class Concept2CommandsInterpreter:
                 break
         if not commands:
             msg = f"There is no such modifier: {modifier}"
-            rospy.logerr(msg)
+            logerr(msg)
             return f"Error: {msg}"
 
         for cmd in commands:
@@ -128,31 +115,26 @@ class Concept2CommandsInterpreter:
                 result = self.CODE_ABORT
             elif self.lock_consciousness.acquire(
                     blocking=False) and not self.lock_consciousness_pause.locked():
-                # rospy.logwarn(f"Acquired by {concept} (node type: {mind_node_type})")
                 result = self.CODE_OK
         elif mind_node_type == node_types.INSTINCT_NODE:
             self.lock_consciousness_abort.acquire(blocking=False)  # will be unlocked when the abort be sent
             if self.lock_instinct.acquire(blocking=False):
-                # rospy.logwarn(f"Acquired by {concept} (node type: {mind_node_type})")
                 result = self.CODE_OK
         elif mind_node_type == node_types.REFLEX_NODE:
             if concept in self.executing_reflex_concepts:  # avoiding executing the same reflex twice
-                rospy.loginfo(f"Reflex busy: {concept} in  {self.executing_reflex_concepts}")
+                loginfo(f"Reflex busy: {concept} in  {self.executing_reflex_concepts}")
                 result = self.CODE_BUSY
             else:
-                rospy.loginfo("Reflex added: " + str(concept))
+                loginfo("Reflex added: " + str(concept))
                 self.executing_reflex_concepts.append(concept)
                 self.lock_consciousness_pause.acquire(blocking=False)
-                rospy.logwarn(f"Acquired by {concept} (node type: {mind_node_type})")
+                logwarn(f"Acquired by {concept} (node type: {mind_node_type})")
                 result = self.CODE_OK
-        # rospy.logwarn(f"Locks: c - {self.lock_consciousness.locked()},  c_pause -
-        # {self.lock_consciousness_pause.locked()}, c_abort - {self.lock_consciousness_abort.locked()},
-        # i - {self.lock_instinct.locked()}")
-        rospy.logdebug("Permission is taken with code: %d (node_type: %d)" % (result, mind_node_type))
+        logdebug("Permission is taken with code: %d (node_type: %d)" % (result, mind_node_type))
         return result
 
     def release_permissions(self, mind_node_type: int, concept: str):
-        # rospy.logwarn(f"Released by {concept} (node type: {mind_node_type})")
+        # logwarn(f"Released by {concept} (node type: {mind_node_type})")
         if mind_node_type == node_types.EGO_NODE:
             self.lock_consciousness.release()
         elif mind_node_type == node_types.INSTINCT_NODE:
@@ -161,7 +143,7 @@ class Concept2CommandsInterpreter:
             self.lock_instinct.release()
         elif mind_node_type == node_types.REFLEX_NODE:
             self.executing_reflex_concepts.remove(concept)
-            rospy.loginfo(f"Reflex {concept} ended. Executing now: {self.executing_reflex_concepts}")
+            loginfo(f"Reflex {concept} ended. Executing now: {self.executing_reflex_concepts}")
             if self.lock_consciousness.locked():
                 self.lock_consciousness.release()
             self.lock_consciousness_pause.release()
@@ -171,12 +153,12 @@ class Concept2CommandsInterpreter:
         concept = req.symbol
         mods = req.modifier
         node_type = req.ego_type
-        rospy.loginfo("Got %s, mods: %s, type: %d" % (concept, mods, node_type))
+        loginfo("Got %s, mods: %s, type: %d" % (concept, mods, node_type))
 
         permission = self.take_permission(node_type, concept)
 
         if permission == self.CODE_OK:
-            rospy.logdebug("Object: %s; Method: %s" % (str(self), str(concept)))
+            logdebug("Object: %s; Method: %s" % (str(self), str(concept)))
             conc_dsc = self.get_concept(concept)
             if conc_dsc is None:
                 res = self.RESPONSE_ERROR
@@ -185,7 +167,7 @@ class Concept2CommandsInterpreter:
             self.release_permissions(node_type, concept)
         elif permission == self.CODE_BUSY:
             res = f"{self.RESPONSE_BUSY} ({node_type}, {concept}, {mods}) : Ignoring the request."
-            rospy.logwarn(res)
+            logwarn(res)
         elif permission == self.CODE_ABORT:
             self.lock_consciousness_abort.release()
             res = self.RESPONSE_ABORT
@@ -196,44 +178,42 @@ class Concept2CommandsInterpreter:
 
     def handler_command_concept_descriptor(
             self, req: srv.CommandConceptDescriptorRequest) -> srv.CommandConceptDescriptorResponse:
-        rospy.logdebug("handler_command_concept_descriptor: %s" % req.descriptor_json)
+        logdebug("handler_command_concept_descriptor: %s" % req.descriptor_json)
         json_dict = json_to_dict(req.descriptor_json)
 
         name = json_dict["name"]
         dsc = json_dict["descriptor"]
         if self.concepts.get(name):
-            rospy.logerr(f"Command concept {name} already exists!")
+            logerr(f"Command concept {name} already exists!")
             return srv.CommandConceptDescriptorResponse(result=self.RESPONSE_ERROR)
         self.concepts[name] = dsc
         return srv.CommandConceptDescriptorResponse(result=self.RESPONSE_OK)
 
     def sensor_callback(self, data: msg.PerceptionConcept):
-        rospy.logdebug("From SensorInterpreter: %s:%s" % (data.symbol, data.modifier))
+        logdebug("From SensorInterpreter: %s:%s" % (data.symbol, data.modifier))
         self.data[data.symbol] = data.modifier
-        rospy.logdebug(self.data)
+        logdebug(self.data)
 
-    def start(self):
-        rospy.logdebug("Node \'%s\' is starting..." % self.name)
-        rospy.init_node(self.name, anonymous=False)
-
-        self.publisher_to_devices = ar.get.publisher(topic_name=ar.topics.DEVICECMD, data_class=msg.DeviceCmd)
-        self.server_of_command_concepts = ar.get.server(name=self.name,
+    def init_communications(self):
+        self.publisher_to_devices = ar.get.publisher(topic_name=get_param("TOPIC_DEV_CMD"),
+                                                     data_class=msg.DeviceCmd)
+        self.server_of_command_concepts = ar.get.server(name=get_param("SRV_C2C_CMDC"),
                                                         service=srv.CommandConcept,
                                                         handle=self.handler_command_concept)
         self.server_of_command_concept_descriptors = ar.get.server(
-            name=ar.services.C2C_COMMAND_CONCEPT_DSC,
+            name=get_param("SRV_C2C_CMDDSC"),
             service=srv.CommandConceptDescriptor,
             handle=self.handler_command_concept_descriptor)
+        self.subscriber_to_perception_concepts = ar.get.subscriber(topic_name=get_param("TOPIC_PC"),
+                                                                   data_class=msg.PerceptionConcept,
+                                                                   callback=self.sensor_callback)
 
-        self.subscriber_to_perception_concepts = ar.get.subscriber(
-            topic_name=ar.topics.MAIN_SENSOR_INTERPRETER,
-            data_class=msg.PerceptionConcept,
-            callback=self.sensor_callback)
-
-        rospy.loginfo("[  DONE  ] Node \'%s\' is ready..." % self.name)
+    def start(self):
+        init_node(name=self.__class__.__name__, anonymous=False)
+        self.init_communications()
 
 
 def start():
-    obj = Concept2CommandsInterpreter(name=splitext(basename(__file__))[0])
+    obj = Concept2CommandsInterpreter()
     obj.start()
-    rospy.spin()
+    spin()

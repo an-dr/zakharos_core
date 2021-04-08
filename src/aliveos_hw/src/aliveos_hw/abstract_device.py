@@ -22,22 +22,41 @@
 
 import threading
 
-import rospy
+from rosparam import get_param
 from rospy.service import ServiceException
+from rospy import logdebug, logerr, logwarn, logwarn_once, init_node, spin
 from rospkg import RosPack, ResourceNotFound
 
 import aliveos_py
 from aliveos_py.helpers.json_tools import json_to_dict, dict_to_json_str, string_to_obj
 from aliveos_msgs import srv, msg
 
+
 class AbstractDevice():
     def __init__(
         self,
         dev_name: str,
-        hw_server_name: str = "",
+        hw_server_name: str = None,
         emotion_core_data_descriptor_json: str = None,
         perception_concept_descriptor_json: str = None,
     ):
+        """
+        Parameters
+        ----------
+        dev_name : str
+            [description]
+        hw_server_name : str, optional
+            If not specified, the HW server will not be used, by default None
+        emotion_core_data_descriptor_json : str, optional
+            If not specified, the data_descriptor server will not be used, by default None
+        perception_concept_descriptor_json : str, optional
+            If not specified, the perception_concept_descriptor server will not be used, by default None
+
+        Raises
+        ------
+        ResourceNotFound
+            [description]
+        """
 
         self.name = dev_name
         self.hw_server_name = hw_server_name
@@ -62,23 +81,16 @@ class AbstractDevice():
 
         # ros clients
         self.client_hw = None
-        self.wait_hw_server_timeout = 0
-
         self.client_emotion_core_data_descriptor = None
-        self.wait_emcore_data_server_timeout = 0
-
         self.client_perception_concept_decriptor = None
-        self.wait_perception_concept_decriptor_server_timeout = 0
-
         # ros subscribers
         self.subscriber_to_cmd = None
-
         # ros publishers
         self.publisher_of_sensor_data = None
 
     def subscriber_to_cmd_callback(self, data: msg.DeviceCmd):
         if ((data.device == self.name) or (data.device == 'all')):
-            rospy.logwarn(f"Got cmd: {data.cmd}({data.arg})")
+            logwarn(f"Got cmd: {data.cmd}({data.arg})")
             cmd_method = getattr(self, f"command_{data.cmd}", None)
             args = string_to_obj(data.arg)
             if cmd_method:
@@ -87,7 +99,7 @@ class AbstractDevice():
                 self.command_unknown(arg_list=[{data.cmd}] + args)
 
     def command_unknown(self, arg_list):
-        rospy.logerr(f"Unknown command {arg_list[0]}, args: {arg_list[1:]}")
+        logerr(f"Unknown command {arg_list[0]}, args: {arg_list[1:]}")
 
     def publish_device_data(self,
                             data_value: float,
@@ -111,8 +123,7 @@ class AbstractDevice():
         to_send.data_type = data_type
         to_send.data_value = data_value
 
-        rospy.logdebug(
-            f"{self.name} published: {to_send.data_source}-{to_send.data_type}-{to_send.data_value}")
+        logdebug(f"{self.name} published: {to_send.data_source}-{to_send.data_type}-{to_send.data_value}")
         self.publisher_of_sensor_data.publish(to_send)
 
     def send_perception_concept_to_d2c(self):
@@ -123,10 +134,10 @@ class AbstractDevice():
             try:
                 r = self.client_perception_concept_decriptor(m)
             except ServiceException:
-                rospy.logerr("Service PerceptionConceptDescriptor error!")
+                logerr("Service PerceptionConceptDescriptor error!")
                 r = None
         else:
-            rospy.logwarn_once("The function was turned off!")
+            logwarn_once("The function was turned off!")
             r = None
         return r
 
@@ -141,71 +152,46 @@ class AbstractDevice():
             try:
                 r = self.client_emotion_core_data_descriptor(m)
             except ServiceException:
-                rospy.logerr("Service EmotionCoreDataDescriptor error!")
+                logerr("Service EmotionCoreDataDescriptor error!")
                 r = None
         else:
-            rospy.logwarn_once("The function was turned off!")
+            logwarn_once("The function was turned off!")
             r = None
         return r
 
-    def _run(self, wait_hw_server: bool = True, wait_hw_server_timeout: int = 15) -> None:
-        rospy.loginfo("Node \'%s\' is starting..." % self.name)
-        rospy.init_node(self.name, anonymous=False)
-
+    def _init_communications(self):
         # Hardware server:
-        self.client_hw = aliveos_py.ros.get.client(srv_name=self.hw_server_name,
-                                                   service=srv.Hw,
-                                                   timeout=self.wait_hw_server_timeout)
+        if self.hw_server_name:
+            self.client_hw = aliveos_py.ros.get.client(srv_name=self.hw_server_name, service=srv.Hw)
 
         # Emotion Core:
         if self.data_dsc_json:
             self.client_emotion_core_data_descriptor = aliveos_py.ros.get.client(
-                srv_name=aliveos_py.ros.services.EMOTIONCORE_DATADSC,
-                service=srv.EmotionCoreDataDescriptor,
-                timeout=self.wait_emcore_data_server_timeout)
+                srv_name=get_param("SRV_ECORE_DDSC"), service=srv.EmotionCoreDataDescriptor)
             self.send_emotion_core_data_descriptor()
 
         # D2C:
         if self.p_concept_json:
             self.client_perception_concept_decriptor = aliveos_py.ros.get.client(
-                srv_name=aliveos_py.ros.services.D2C_PERCEPTION_DSC,
-                service=srv.PerceptionConceptDescriptor,
-                timeout=self.wait_perception_concept_decriptor_server_timeout)
+                srv_name=get_param("SRV_D2C_PCDSC"), service=srv.PerceptionConceptDescriptor)
             self.send_perception_concept_to_d2c()
 
         # C2C:
-        self.subscriber_to_cmd = aliveos_py.ros.get.subscriber(topic_name=aliveos_py.ros.topics.DEVICECMD,
+        self.subscriber_to_cmd = aliveos_py.ros.get.subscriber(topic_name=get_param("TOPIC_DEV_CMD"),
                                                                data_class=msg.DeviceCmd,
                                                                callback=self.subscriber_to_cmd_callback)
         # Device itself
-        self.publisher_of_sensor_data = aliveos_py.ros.get.publisher(
-            topic_name=aliveos_py.ros.topics.SENSOR_DATA, data_class=msg.DeviceData)
+        self.publisher_of_sensor_data = aliveos_py.ros.get.publisher(topic_name=get_param("TOPIC_DEV_DATA"),
+                                                                     data_class=msg.DeviceData)
 
-        rospy.loginfo("[  DONE  ] Node \'%s\' is ready..." % self.name)
-
+    def _run(self) -> None:
+        init_node(self.name, anonymous=False)
+        self._init_communications()
         self.main()
 
-    def start(
-        self,
-        wait_hw_srv_sec: int = 15,
-        wait_ecore_data_dsc_srv_sec: int = 15,
-        wait_perception_dsc_srv_sec: int = 15,
-    ):
-        """
-        Parameters
-        ----------
-        wait_hw_server_timeout : int, optional
-            If timeout < 0 the client won't be created. Related functions will be unavailable. By default 15 sec
-        wait_emcore_data_server_timeout : int, optional
-            If timeout < 0 the client won't be created. Related functions will be unavailable. By default 15 sec
-        wait_perception_concept_decriptor_server_timeout : int, optional
-            If timeout < 0 the client won't be created. Related functions will be unavailable. By default 15 sec
-        """
-        self.wait_hw_server_timeout = wait_hw_srv_sec
-        self.wait_emcore_data_server_timeout = wait_ecore_data_dsc_srv_sec
-        self.wait_perception_concept_decriptor_server_timeout = wait_perception_dsc_srv_sec
+    def start(self):
         self._run()
-        rospy.spin()
+        spin()
 
     def main(self):
         raise NotImplementedError
