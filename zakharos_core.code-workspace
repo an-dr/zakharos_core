@@ -1,7 +1,6 @@
 {
     "extensions": {
         "recommendations": [
-            "actboy168.tasks",
             "gruntfuggly.todo-tree",
             "ms-iot.vscode-ros",
             "ms-python.python",
@@ -234,6 +233,11 @@
                 "label": "Kill all python processes",
                 "type": "shell",
                 "command": "pkill python",
+            },
+            {
+                "label": "Install AliveOS dependencies",
+                "type": "shell",
+                "command": "${workspaceFolder}/src/aliveos/download.sh",
             },
             {
                 "label": "Update zakhar-pycore (pypi.org)",
