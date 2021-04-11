@@ -1,0 +1,9 @@
+# https://pypi.org/project/cmake-format/0.2.0/
+autosort: True
+dangle_parens: True
+line_ending: 'unix'
+line_width: 120
+max_subgroups_hwrap: 2
+separate_ctrl_name_with_space: True
+separate_fn_name_with_space: True
+tab_size: 4

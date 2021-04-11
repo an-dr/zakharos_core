@@ -1,0 +1,6 @@
+string sensor_name
+uint32 val_max
+uint32 val_min
+string weights_json
+---
+string result

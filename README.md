@@ -12,7 +12,7 @@ The repository is represented by ROS-packages:
 - [zakhar_common](src/zakhar_common) - facilities used by all packages
 - [zakhar_i2c](src/zakhar_i2c) - Zakhar's ROS I2C server and an abstract I2C device class
 - [zakhar_i2c_devices](src/zakhar_i2c_devices) - nodes representing parts of the robot
-- [zakhar_interpreters](src/zakhar_interpreters) - convert data to concepts understandable to ego-like nodes and vice versa
+- [aliveos_interpreters](src/aliveos_interpreters) - convert data to concepts understandable to ego-like nodes and vice versa
 - [zakhar_launch](src/zakhar_launch) - robot launching configurations
 - [zakhar_i2c_mind](src/zakhar_i2c_mind) - nodes executing high level processes
 - [zakhar_i2c_mind_tests](src/zakhar_i2c_mind) - used for development purposes

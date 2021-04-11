@@ -1,0 +1,20 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/opt/ros/noetic/include/**",
+        "/usr/include/**",
+			  "/home/mind/zakharos_core/devel/include/**",
+        "/home/mind/zakharos_core/src/zakhar_emotion_core/libs/r_giskard_EmotionCore/include/**",
+        "/home/mind/zakharos_core/src/zakhar_emotion_core/include/**"
+
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}

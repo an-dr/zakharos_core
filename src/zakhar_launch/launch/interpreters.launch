@@ -1,6 +1,0 @@
-<launch>
-
-    <node name="concept2commands_interpreter" pkg="zakhar_interpreters" type="concept2commands_interpreter.py"/>
-    <node name="data2concept_interpreter" pkg="zakhar_interpreters" type="data2concept_interpreter.py"/>
-
-</launch>

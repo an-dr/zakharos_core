@@ -5,6 +5,15 @@
 src/zakhar_mind/scripts/dist
 src/zakhar_mind/scripts/poetry.lock
 
+# aliveos deps
+src/aliveos_app
+src/aliveos_demo
+src/aliveos_hw
+src/aliveos_launch
+src/aliveos_middle
+src/aliveos_msgs
+src/aliveos_py
+
 # catkin ws files
 build
 devel
@@ -15,4 +24,5 @@ src/CMakeLists.txt
 logs
 
 # ide files
-.vscode
+.vscode/**
+!.vscode/c_cpp_properties.json
