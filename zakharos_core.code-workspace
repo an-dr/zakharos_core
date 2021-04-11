@@ -236,6 +236,11 @@
                 "command": "pkill python",
             },
             {
+                "label": "Install AliveOS dependencies",
+                "type": "shell",
+                "command": "${workspaceFolder}/src/aliveos/download.sh",
+            },
+            {
                 "label": "Update zakhar-pycore (pypi.org)",
                 "type": "shell",
                 "command": "python3 -m pip install --no-cache-dir --force-reinstall --user zakhar_pycore",

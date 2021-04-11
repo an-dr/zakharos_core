@@ -1,5 +1,0 @@
-uint32 ego_type
-string symbol
-string modifier
----
-string result

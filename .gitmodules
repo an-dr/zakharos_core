@@ -1,3 +1,3 @@
-[submodule "src/aliveos_middle/cpp/lib/r_giskard_EmotionCore"]
-	path = src/aliveos_middle/cpp/lib/r_giskard_EmotionCore
-	url = git@github.com:an-dr/r_giskard_EmotionCore.git
+[submodule "src/aliveos"]
+	path = src/aliveos
+	url = git@github.com:an-dr/aliveos.git

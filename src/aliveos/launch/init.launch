@@ -1,6 +1,0 @@
-<launch>
-
-    <include file="$(find aliveos_msgs)/launch/param/services.launch" />
-    <include file="$(find aliveos_msgs)/launch/param/topics.launch" />
-
-</launch>
